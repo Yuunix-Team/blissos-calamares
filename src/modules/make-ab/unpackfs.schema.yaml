@@ -1,0 +1,8 @@
+# SPDX-FileCopyrightText: 2024 Shadichy <shadichy@gmail.com>
+# SPDX-License-Identifier: GPL-3.0-or-later
+---
+$schema: https://json-schema.org/schema#
+$id: https://calamares.io/schemas/make-ab
+additionalProperties: false
+type: object
+properties:

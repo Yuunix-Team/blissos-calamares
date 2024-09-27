@@ -85,10 +85,7 @@ class UnpackEntry:
         def cb_count(s):
             counter.count += 1
 
-        if self.sourcefs == "squashfs":
-            libcalamares.utils.host_env_process_output(["unsquashfs", "-l", self.source], cb_count)
-
-        elif self.sourcefs == "ext4":
+        if self.sourcefs == "ext4" or self.sourcefs == "squashfs" or self.sourcefs == "erofs":
             libcalamares.utils.host_env_process_output(["find", self.mountPoint, "-type", "f"], cb_count)
 
         elif self.is_file():
