@@ -6,3 +6,12 @@ $id: https://calamares.io/schemas/make-ab
 additionalProperties: false
 type: object
 properties:
+    make-ab:
+        type: array
+        items:
+            type: object
+            additionalProperties: false
+            properties:
+                file: { type: string }
+            required: [ file ]
+
