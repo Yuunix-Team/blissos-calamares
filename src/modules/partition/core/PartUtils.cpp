@@ -404,7 +404,7 @@ runOsprober( DeviceModel* dm )
             }
 
             FstabEntryList fstabEntries = lookForFstabEntries( path );
-            QString homePath = findPartitionPathForMountPoint( fstabEntries, "/home" );
+            QString homePath = findPartitionPathForMountPoint( fstabEntries, "/data" );
 
             osproberEntries.append( { prettyName,
                                       path,

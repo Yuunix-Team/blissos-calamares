@@ -177,11 +177,11 @@ PartitionLabelsView::buildTexts( const QModelIndex& index ) const
             {
                 firstLine = m_customNewRootLabel.isEmpty() ? tr( "Root" ) : m_customNewRootLabel;
             }
-            else if ( mountPoint == "/home" )
+            else if ( mountPoint == "/data" )
             {
                 firstLine = tr( "Home", "@label" );
             }
-            else if ( mountPoint == "/boot" )
+            else if ( mountPoint == "/grub" )
             {
                 firstLine = tr( "Boot", "@label" );
             }

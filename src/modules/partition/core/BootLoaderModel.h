@@ -20,7 +20,7 @@ class QComboBox;
 
 /**
  * This model contains one entry for each device MBR plus one entry for the
- * /boot or / partition
+ * /grub or / partition
  */
 class BootLoaderModel : public QStandardItemModel
 {

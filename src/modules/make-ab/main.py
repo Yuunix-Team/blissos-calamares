@@ -35,6 +35,8 @@ def pretty_status_message():
     return status
 
 def turn_ab(file):
+    file_renamed=re.sub(r"",)
+    libcalamares.utils.host_env_process_output([], None)
     return
 
 def run():

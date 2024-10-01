@@ -108,9 +108,9 @@ CreateLayoutsTests::testMixedSizePartition()
         QFAIL( qPrintable( "Unable to create / partition" ) );
     }
 
-    if ( !layout.addEntry( { FileSystem::Type::Ext4, QString( "/home" ), QString( "50%" ) } ) )
+    if ( !layout.addEntry( { FileSystem::Type::Ext4, QString( "/data" ), QString( "50%" ) } ) )
     {
-        QFAIL( qPrintable( "Unable to create /home partition" ) );
+        QFAIL( qPrintable( "Unable to create /data partition" ) );
     }
 
     if ( !layout.addEntry( { FileSystem::Type::Ext4, QString( "/bkup" ), QString( "50%" ) } ) )

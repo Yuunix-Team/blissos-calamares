@@ -170,23 +170,23 @@ def get_kernel_params(uuid):
             cryptdevice_params.append(f"root=/dev/mapper/{partition['luksMapperName']}")
 
     # btrfs and zfs handling
-    for partition in partitions:
-        # If a btrfs root subvolume wasn't set, it means the root is directly on the partition
-        # and this option isn't needed
-        if is_btrfs_root(partition):
-            btrfs_root_subvolume = libcalamares.globalstorage.value("btrfsRootSubvolume")
-            if btrfs_root_subvolume:
-                kernel_params.append("rootflags=subvol=" + btrfs_root_subvolume)
+    # for partition in partitions:
+    #     # If a btrfs root subvolume wasn't set, it means the root is directly on the partition
+    #     # and this option isn't needed
+    #     if is_btrfs_root(partition):
+    #         btrfs_root_subvolume = libcalamares.globalstorage.value("btrfsRootSubvolume")
+    #         if btrfs_root_subvolume:
+    #             kernel_params.append("rootflags=subvol=" + btrfs_root_subvolume)
 
-        # zfs needs to be told the location of the root dataset
-        if is_zfs_root(partition):
-            zfs_root_path = get_zfs_root()
-            if zfs_root_path is not None:
-                kernel_params.append("root=ZFS=" + zfs_root_path)
-            else:
-                # Something is really broken if we get to this point
-                libcalamares.utils.warning("Internal error handling zfs dataset")
-                raise Exception("Internal zfs data missing, please contact your distribution")
+    #     # zfs needs to be told the location of the root dataset
+    #     if is_zfs_root(partition):
+    #         zfs_root_path = get_zfs_root()
+    #         if zfs_root_path is not None:
+    #             kernel_params.append("root=ZFS=" + zfs_root_path)
+    #         else:
+    #             # Something is really broken if we get to this point
+    #             libcalamares.utils.warning("Internal error handling zfs dataset")
+    #             raise Exception("Internal zfs data missing, please contact your distribution")
 
     if cryptdevice_params:
         kernel_params.extend(cryptdevice_params)

@@ -819,7 +819,7 @@ ChoicePage::doReplaceSelectedPartition( const QModelIndex& current )
                 if ( isPartitionFreeSpace( selectedPartition ) )
                 {
                     //NOTE: if the selected partition is free space, we don't deal with
-                    //      a separate /home partition at all because there's no existing
+                    //      a separate /data partition at all because there's no existing
                     //      rootfs to read it from.
                     PartitionRole newRoles = PartitionRole( PartitionRole::Primary );
                     PartitionNode* newParent = selectedDevice()->partitionTable();
@@ -878,7 +878,7 @@ ChoicePage::doReplaceSelectedPartition( const QModelIndex& current )
 
                         if ( homePartition && doReuseHomePartition )
                         {
-                            PartitionInfo::setMountPoint( homePartition, "/home" );
+                            PartitionInfo::setMountPoint( homePartition, "/data" );
                             gs->insert( "reuseHome", true );
                         }
                         else

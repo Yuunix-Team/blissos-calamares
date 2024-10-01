@@ -506,7 +506,7 @@ shouldWarnForNotEncryptedBoot( const Config* config, const PartitionCoreModule* 
     if ( config->showNotEncryptedBootMessage() )
     {
         Partition* root_p = core->findPartitionByMountPoint( "/" );
-        Partition* boot_p = core->findPartitionByMountPoint( "/boot" );
+        Partition* boot_p = core->findPartitionByMountPoint( "/grub" );
 
         if ( root_p && boot_p )
         {

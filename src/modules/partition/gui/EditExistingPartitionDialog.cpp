@@ -360,10 +360,10 @@ EditExistingPartitionDialog::toggleEncryptWidget()
     // Show/hide encryptWidget:
     // check if partition is a previously luks formatted partition
     // and not currently formatted
-    // and its mount point not a standard mount point except when it's /home
+    // and its mount point not a standard mount point except when it's /data
     QString mp = selectedMountPoint( m_ui->mountPointComboBox );
     if ( !mp.isEmpty() && m_partition->fileSystem().type() == FileSystem::Luks && !m_ui->formatRadioButton->isChecked()
-         && ( !standardMountPoints().contains( mp ) || mp == "/home" ) )
+         && ( !standardMountPoints().contains( mp ) || mp == "/data" ) )
     {
         m_ui->encryptWidget->show();
         m_ui->encryptWidget->reset( false );
