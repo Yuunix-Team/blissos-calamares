@@ -167,7 +167,7 @@ def get_kernel_params(uuid):
                 cryptdevice_params = [f"rd.luks.uuid={partition['luksUuid']}"]
             else:
                 cryptdevice_params = [f"cryptdevice=UUID={partition['luksUuid']}:{partition['luksMapperName']}"]
-            cryptdevice_params.append(f"root=/dev/mapper/{partition['luksMapperName']}")
+            cryptdevice_params.append(f"ROOT=/dev/mapper/{partition['luksMapperName']}")
 
     # btrfs and zfs handling
     # for partition in partitions:
@@ -191,16 +191,17 @@ def get_kernel_params(uuid):
     if cryptdevice_params:
         kernel_params.extend(cryptdevice_params)
     else:
-        kernel_params.append("root=UUID={!s}".format(uuid))
+        kernel_params.append("ROOT=UUID={!s}".format(uuid))
 
-    if swap_uuid:
-        kernel_params.append("resume=UUID={!s}".format(swap_uuid))
+    # by default Android disables hiberantion
+    # if swap_uuid:
+    #     kernel_params.append("resume=UUID={!s}".format(swap_uuid))
 
     if use_systemd_naming and swap_outer_uuid:
         kernel_params.append(f"rd.luks.uuid={swap_outer_uuid}")
 
-    if swap_outer_mappername:
-        kernel_params.append(f"resume=/dev/mapper/{swap_outer_mappername}")
+    # if swap_outer_mappername:
+    #     kernel_params.append(f"resume=/dev/mapper/{swap_outer_mappername}")
 
     return kernel_params
 
@@ -248,10 +249,10 @@ def create_loader(loader_path, installation_root_path):
     :param loader_path: The absolute path to the loader.conf file
     :param installation_root_path: The path to the root of the target installation
     """
-    
+
     """
      Obsolete since default was changed to @saved from machine-id
-     
+
      get the machine-id
      with open(os.path.join(installation_root_path, "etc", "machine-id"), 'r') as machineid_file:
         machine_id = machineid_file.read().rstrip('\n')

@@ -1,0 +1,54 @@
+pkgname=blissos-calamares
+pkgver=3.2.47
+pkgrel=1
+arch="all !armhf !ppc64le !s390x !riscv64"
+url="https://calamares.io/"
+pkgdesc="Distribution-independent installer framework"
+license="GPL-3.0-or-later AND LGPL-2.1-only"
+depends="
+	ckbcomp
+	musl-locales
+	os-prober
+	"
+
+depends_dev="
+	extra-cmake-modules
+	kcoreaddons-dev
+	qt6-qttools-dev
+	yaml-cpp-dev
+	"
+makedepends="$depends_dev
+	kconfig-dev
+	kcrash-dev
+	ki18n-dev
+	kpackage-dev
+	kparts-dev
+	kpmcore-dev
+	kservice-dev
+	kwidgetsaddons-dev
+	libatasmart-dev
+	libpwquality-dev
+	plasma-framework-dev
+	polkit-qt-1-dev
+	qt6-qtbase-dev
+	qt6-qtdeclarative-dev
+	qt6-qtsvg-dev
+	qt6-qtwebengine-dev
+	"
+# required for several modules
+makedepends="$makedepends
+	boost-dev
+	boost-python3
+	parted-dev
+	python3-dev
+	"
+
+build() {
+	./build.sh
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install ../build
+}
+
+

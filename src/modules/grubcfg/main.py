@@ -96,7 +96,7 @@ def update_existing_config(default_grub, grub_config_items):
     :param default_grub: The absolute path to the grub config file
     :param grub_config_items: A dict holding the key value pairs representing the items
     """
-    
+
     default_grub_orig = default_grub + ".calamares"
     shutil.move(default_grub, default_grub_orig)
 
@@ -207,7 +207,7 @@ def modify_grub_default(partitions, root_mount_point, distributor):
             if partition["mountPoint"] == "/" and has_luks:
                 cryptdevice_params = [
                     f"cryptdevice=UUID={partition['luksUuid']}:{partition['luksMapperName']}",
-                    f"root=/dev/mapper/{partition['luksMapperName']}"
+                    f"/dev/mapper/{partition['luksMapperName']}"
                 ]
 
             if partition["fs"] == "zfs" and partition["mountPoint"] == "/":
