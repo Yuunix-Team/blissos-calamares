@@ -635,7 +635,7 @@ Trình cài đặt sẽ thoát và tất cả các thay đổi sẽ bị mất.<
     <message>
       <location filename="../src/calamares/CalamaresWindow.cpp" line="406"/>
       <source>%1 Installer</source>
-      <translation>%1 cài đặt hệ điều hành</translation>
+      <translation>Cài đặt hệ điều hành %1</translation>
     </message>
   </context>
   <context>

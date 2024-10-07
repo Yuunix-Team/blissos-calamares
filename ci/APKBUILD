@@ -5,12 +5,12 @@ arch="all !armhf !ppc64le !s390x !riscv64"
 url="https://calamares.io/"
 pkgdesc="Distribution-independent installer framework"
 license="GPL-3.0-or-later AND LGPL-2.1-only"
+options="!check"
 depends="
 	ckbcomp
 	musl-locales
 	os-prober
 	"
-
 depends_dev="
 	extra-cmake-modules
 	kcoreaddons-dev
@@ -28,8 +28,8 @@ makedepends="$depends_dev
 	kwidgetsaddons-dev
 	libatasmart-dev
 	libpwquality-dev
-	plasma-framework-dev
-	polkit-qt-1-dev
+	plasma-integration
+	polkit-qt-dev
 	qt6-qtbase-dev
 	qt6-qtdeclarative-dev
 	qt6-qtsvg-dev
@@ -43,12 +43,18 @@ makedepends="$makedepends
 	python3-dev
 	"
 
+subpackages="$pkgname-dev $pkgname-doc $pkgname-lang"
+
 build() {
-	./build.sh
+	cmake \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib \
+		-DINSTALL_CONFIG=ON \
+		-DWITH_QT6=ON ..
 }
 
 package() {
-	DESTDIR="$pkgdir" cmake --install ../build
+	echo $pkgdir
+	make DESTDIR="$pkgdir" install
 }
-
-
