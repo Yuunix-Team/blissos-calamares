@@ -1,0 +1,86 @@
+# Contributor: Bart Ribbers <bribbers@disroot.org>
+# Maintainer: Oliver Smith <ollieparanoid@postmarketos.org>
+pkgname=blissos-calamares
+pkgver=3.3.10
+pkgrel=6
+# armhf blocked by qt6-qtdeclarative
+# ppc64le, s390x, and riscv64 blocked by qt6-qtwebengine
+arch="all !armhf !ppc64le !s390x !riscv64"
+url="https://calamares.io/"
+pkgdesc="Distribution-independent installer framework"
+license="GPL-3.0-or-later AND LGPL-2.1-only"
+options="!check"
+provides="calamares"
+depends="
+	ckbcomp
+	musl-locales
+	os-prober
+	kpmcore
+	blissos-installer-data
+	"
+depends_dev="
+	extra-cmake-modules
+	kcoreaddons-dev
+	qt6-qttools-dev
+	yaml-cpp-dev
+	kpmcore-dev
+	"
+makedepends="$depends_dev
+	kconfig-dev
+	kcrash-dev
+	ki18n-dev
+	kpackage-dev
+	kparts-dev
+	kpmcore-dev
+	kservice-dev
+	kwidgetsaddons-dev
+	libatasmart-dev
+	libpwquality-dev
+	plasma-framework5-dev
+	polkit-qt-dev
+	qt6-qtbase-dev
+	qt6-qtdeclarative-dev
+	qt6-qtsvg-dev
+	qt6-qtwebengine-dev
+	"
+# required for several modules
+makedepends="$makedepends
+	boost-dev
+	boost-python3
+	parted-dev
+	python3-dev
+	"
+checkdepends="
+	py3-toml
+	tzdata
+	xvfb-run
+	"
+
+subpackages="$pkgname-dev $pkgname-doc $pkgname-lang"
+
+export QT_SELECT=6
+
+build() {
+	mkdir -p build
+	cd build
+	cmake \
+		-DCMAKE_BUILD_TYPE=Release \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib \
+		-DINSTALL_CONFIG=ON \
+		-DWITH_QT6=ON \
+		../blissos-calamares
+	make -j$(nproc --all)
+}
+
+check() {
+	# libcalamaresnetworktest requires network access
+	# machineidtest fails to detect random poolsize
+	# userstest always expects "x8664X" cpu name
+	CTEST_OUTPUT_ON_FAILURE=TRUE xvfb-run ctest -E "libcalamaresnetworktest|machineidtest|userstest" -j1
+}
+
+package() {
+	cd build
+	make DESTDIR="$pkgdir" install
+}
