@@ -15,12 +15,15 @@ depends="
 	ckbcomp
 	musl-locales
 	os-prober
+	kpmcore<=23.04.3-r0
+	blissos-installer-data
 	"
 depends_dev="
 	extra-cmake-modules
 	kcoreaddons5-dev
 	qt5-qttools-dev
 	yaml-cpp-dev
+	kpmcore-dev<=23.04.3-r0
 	"
 makedepends="$depends_dev
 	kconfig5-dev
