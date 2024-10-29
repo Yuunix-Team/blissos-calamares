@@ -1,0 +1,53 @@
+name: Generate .deb
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - v*
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker Image
+        run: |
+          docker buildx create --use --name devuan-dev --buildkitd-flags '--allow-insecure-entitlement security.insecure'
+          docker buildx build --builder devuan-dev -f ci/debian/Dockerfile -t devuan --allow security.insecure --output type=tar,dest=install.tar .
+
+      - name: Extract .deb
+        run: |
+          # Export it to install
+          mkdir install
+          sudo tar -C install -psxvf install.tar
+          # Move .deb out
+          mv install/calamares_*.deb ./calamares.deb
+          # Clean up
+          sudo rm -rf install install.tar
+
+      - name: Set Vars
+        id: vars
+        run: |
+          echo "arch=$(dpkg --print-architecture)" >> "$GITHUB_OUTPUT"
+
+      - name: Upload deb
+        uses: actions/upload-artifact@v4
+        with:
+          name: calamares.deb
+          path: calamares.deb

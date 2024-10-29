@@ -1,0 +1,5 @@
+calamares (3.10.1-1) UNRELEASED; urgency=medium
+
+  * Initial release. (Closes: #nnnn)  <nnnn is the bug number of your ITP>
+
+ -- Shadichy <shadichy.dev@gmail.com>  Tue, 29 Oct 2024 16:22:04 +0700
