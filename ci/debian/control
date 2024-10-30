@@ -44,9 +44,19 @@ Homepage: <insert the upstream URL, if relevant>
 #Vcs-Git: https://salsa.debian.org/debian/calamares.git
 
 Package: calamares
-Architecture: any
+Architecture: linux-any
 Multi-Arch: foreign
-Depends: ${shlibs:Depends},
+Depends: os-prober,
+  ${shlibs:Depends},
   ${misc:Depends},
-Description: <insert up to 60 chars description>
-  <Insert long description, indented with spaces.>
+Description: distribution-independent installer framework
+ Calamares is a distribution-independent installer framework.
+ .
+ It provides a graphical installer that can be used with nearly
+ any distribution. This package is suitable for live media on
+ Debian-based systems, and won't be of any particular use on
+ an already installed system.
+ .
+ You will likely want to provide your own config files to match
+ your distribution, reading the Calamares documentation will guide
+ you through that process.
