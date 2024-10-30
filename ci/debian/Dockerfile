@@ -7,15 +7,15 @@ COPY . /calamares
 RUN apt update && apt upgrade -y
 
 # Install debhelper
-RUN apt install -y debhelper
+RUN yes | apt install -y debhelper cryptsetup pkg-kde-tools pkexec || :
+
+# Create .orig tarball
+RUN tar -cJf calamares_3.10.1.orig.tar.xz calamares
 
 WORKDIR "/calamares"
 
 # Install dependencies
 RUN ./ci/deps-debian11.sh
-
-# Fuck up dpkg-source
-RUN echo -e '#!/bin/sh\nexit 0' >/bin/dpkg-source
 
 # Move debian folder to top
 RUN mv ./ci/debian .

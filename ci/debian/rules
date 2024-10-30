@@ -17,6 +17,10 @@ override_dh_auto_configure:
 		-DCMAKE_BUILD_TYPE=Release \
 		-DINSTALL_CONFIG=ON
 
+override_dh_auto_install:
+	dh_auto_install -- || :
+	rm -rf debian/calamares/usr/include debian/calamares/usr/lib/*/cmake
+
 # Some test don't work well, we don't need to run them at package build time.
 override_dh_auto_test:
 
