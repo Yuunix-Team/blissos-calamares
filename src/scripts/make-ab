@@ -4,8 +4,8 @@
 file=$1
 size=$2
 
-file_postfix=${file##*.}
-[ "$file_postfix" = "$file" ] && file_postfix=
+file_postfix=.${file##*.}
+[ "$file_postfix" = ".$file" ] && file_postfix=
 
 mv "$file" "${file%.*}_a$file_postfix"
 

@@ -81,6 +81,6 @@ def run():
         return (_("Bad mount point for root partition"),
                 _("rootMountPoint is \"{}\", which does not exist.".format(root_mount_point)))
 
-    run_in_host(["/usr/share/calamares/gen-img", root_mount_point],line_cb)
+    run_in_host(["/usr/share/calamares/scripts/gen-img", root_mount_point], line_cb)
     libcalamares.job.setprogress(1.0)
     return None

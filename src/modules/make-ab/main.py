@@ -35,7 +35,7 @@ def pretty_status_message():
     return status
 
 def turn_ab(file, size):
-    libcalamares.utils.host_env_process_output(["/usr/share/calamares/make-ab", file, size], None)
+    libcalamares.utils.host_env_process_output(["/usr/share/calamares/scripts/make-ab", file, size], None)
     return None
 
 def run():
@@ -63,7 +63,7 @@ def run():
     #   - non-existent sources
     #   - missing tools for specific FS
     for entry in libcalamares.job.configuration["make-ab"]:
-        file = os.path.abspath(entry["file"])
+        file = os.path.join(root_mount_point, entry["file"])
         size = entry["size"]
 
         if not os.path.exists(file):
@@ -71,6 +71,6 @@ def run():
             return (_("Bad make-ab configuration"),
                     _("The source file \"{}\" does not exist").format(file))
 
-        turn_ab("{}/{}".format(root_mount_point, file, size))
+        turn_ab(file, size)
 
     return None
