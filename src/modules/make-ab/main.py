@@ -20,23 +20,33 @@ import tempfile
 import libcalamares
 
 import gettext
-_ = gettext.translation("calamares-python",
-                        localedir=libcalamares.utils.gettext_path(),
-                        languages=libcalamares.utils.gettext_languages(),
-                        fallback=True).gettext
+
+_ = gettext.translation(
+    "calamares-python",
+    localedir=libcalamares.utils.gettext_path(),
+    languages=libcalamares.utils.gettext_languages(),
+    fallback=True,
+).gettext
+
 
 def pretty_name():
     return _("Filling up filesystems.")
 
+
 # This is going to be changed from various methods
 status = pretty_name()
+
 
 def pretty_status_message():
     return status
 
+
 def turn_ab(file, size):
-    libcalamares.utils.host_env_process_output(["/usr/share/calamares/scripts/make-ab", file, size], None)
+    libcalamares.utils.host_env_process_output(
+        ["/usr/share/calamares/scripts/make-ab", file, size], None
+    )
     return None
+
 
 def run():
     """
@@ -46,17 +56,23 @@ def run():
 
     if not root_mount_point:
         libcalamares.utils.warning("No mount point for root partition")
-        return (_("No mount point for root partition"),
-                _("globalstorage does not contain a \"rootMountPoint\" key."))
+        return (
+            _("No mount point for root partition"),
+            _('globalstorage does not contain a "rootMountPoint" key.'),
+        )
     if not os.path.exists(root_mount_point):
-        libcalamares.utils.warning("Bad root mount point \"{}\"".format(root_mount_point))
-        return (_("Bad mount point for root partition"),
-                _("rootMountPoint is \"{}\", which does not exist.".format(root_mount_point)))
+        libcalamares.utils.warning('Bad root mount point "{}"'.format(root_mount_point))
+        return (
+            _("Bad mount point for root partition"),
+            _('rootMountPoint is "{}", which does not exist.'.format(root_mount_point)),
+        )
 
     if libcalamares.job.configuration.get("make-ab", None) is None:
         libcalamares.utils.warning("No *make-ab* key in job configuration.")
-        return (_("Bad make-ab configuration"),
-                _("There is no configuration information."))
+        return (
+            _("Bad make-ab configuration"),
+            _("There is no configuration information."),
+        )
 
     # Bail out before we start when there are obvious problems
     #   - unsupported filesystems
@@ -67,9 +83,13 @@ def run():
         size = entry["size"]
 
         if not os.path.exists(file):
-            libcalamares.utils.warning("The source filesystem \"{}\" does not exist".format(file))
-            return (_("Bad make-ab configuration"),
-                    _("The source file \"{}\" does not exist").format(file))
+            libcalamares.utils.warning(
+                'The source filesystem "{}" does not exist'.format(file)
+            )
+            return (
+                _("Bad make-ab configuration"),
+                _('The source file "{}" does not exist').format(file),
+            )
 
         turn_ab(file, size)
 

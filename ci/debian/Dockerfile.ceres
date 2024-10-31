@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1-labs
-FROM devuan/migrated:excalibur-slim
+FROM devuan/migrated:ceres-slim
 
 COPY . /calamares
 
@@ -10,7 +10,7 @@ RUN apt update && apt upgrade -y
 RUN yes | apt install -y debhelper cryptsetup pkg-kde-tools pkexec os-prober rsync || :
 
 # Create .orig tarball
-RUN tar -cJf calamares_3.10.1.orig.tar.xz calamares
+RUN tar -cJf calamares_3.3.10.orig.tar.xz calamares
 
 WORKDIR "/calamares"
 

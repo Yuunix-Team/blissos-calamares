@@ -29,13 +29,13 @@ def pretty_name():
     return _("Writing fstab.")
 
 
-FSTAB_HEADER = """# /etc/fstab: static file system information.
+FSTAB_HEADER = """# fstab.android: static file system information.
 #
 # Use 'blkid' to print the universally unique identifier for a device; this may
 # be used with UUID= as a more robust way to name devices that works even if
 # disks are added and removed. See fstab(5).
 #
-# <file system>             <mount point>  <type>  <options>  <dump>  <pass>"""
+# <src>    <mnt_point>    <type>    <mnt_flags and options>    <fs_mgr_flags>"""
 
 CRYPTTAB_HEADER = """# /etc/crypttab: mappings for encrypted partitions.
 #
@@ -129,8 +129,7 @@ class FstabGenerator(object):
 
     def generate_crypttab(self):
         """ Create crypttab. """
-        mkdir_p(os.path.join(self.root_mount_point, "etc"))
-        crypttab_path = os.path.join(self.root_mount_point, "etc", "crypttab")
+        crypttab_path = os.path.join(self.root_mount_point, "crypttab")
 
         with open(crypttab_path, "w") as crypttab_file:
             print(CRYPTTAB_HEADER, file=crypttab_file)
@@ -181,7 +180,7 @@ class FstabGenerator(object):
         )
 
     def print_crypttab_line(self, dct, file=None):
-        """ Prints line to '/etc/crypttab' file. """
+        """ Prints line to '/crypttab' file. """
         line = "{:21} {:<45} {} {}".format(dct["name"],
                                            dct["device"],
                                            dct["password"],
@@ -192,11 +191,13 @@ class FstabGenerator(object):
 
     def generate_fstab(self):
         """ Create fstab. """
-        mkdir_p(os.path.join(self.root_mount_point, "etc"))
-        fstab_path = os.path.join(self.root_mount_point, "etc", "fstab")
+        fstab_path = os.path.join(self.root_mount_point, "fstab.android")
 
         with open(fstab_path, "w") as fstab_file:
             print(FSTAB_HEADER, file=fstab_file)
+            print("#>/system$SLOT.img  /\n", file=fstab_file)
+            print("#>/data.img  /data\n", file=fstab_file)
+            print("#>/data  /data\n", file=fstab_file)
 
             for partition in self.partitions:
                 # Special treatment for a btrfs subvolumes
@@ -301,11 +302,10 @@ class FstabGenerator(object):
 
     def print_fstab_line(self, dct, file=None):
         """ Prints line to '/etc/fstab' file. """
-        line = "{:41} {:<14} {:<7} {:<10} 0 {}".format(dct["device"],
+        line = "{:41} {:<14} {:<7} {:<10} defaults".format(dct["device"],
                                                        dct["mount_point"],
                                                        dct["fs"],
                                                        dct["options"],
-                                                       dct["check"],
                                                        )
         print(line, file=file)
 

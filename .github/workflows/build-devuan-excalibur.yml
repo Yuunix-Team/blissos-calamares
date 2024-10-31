@@ -30,7 +30,7 @@ jobs:
       - name: Build Docker Image
         run: |
           docker buildx create --use --name devuan-dev --buildkitd-flags '--allow-insecure-entitlement security.insecure'
-          docker buildx build --builder devuan-dev -f ci/debian/Dockerfile -t devuan --allow security.insecure --output type=tar,dest=install.tar .
+          docker buildx build --builder devuan-dev -f ci/debian/Dockerfile.excalibur -t devuan --allow security.insecure --output type=tar,dest=install.tar .
 
       - name: Extract .deb
         run: |
