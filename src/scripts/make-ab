@@ -1,0 +1,12 @@
+#!/usr/bin/bash
+
+[ "$2" ] || exit 1
+file=$1
+size=$2
+
+file_postfix=${file##*.}
+[ "$file_postfix" = "$file" ] && file_postfix=
+
+mv "$file" "${file%.*}_a$file_postfix"
+
+dd if=/dev/zero bs=1 count=0 seek="${size}M" of="${file%.*}_b$file_postfix"

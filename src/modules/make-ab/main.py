@@ -35,7 +35,7 @@ def pretty_status_message():
     return status
 
 def turn_ab(file, size):
-    libcalamares.utils.host_env_process_output(["/usr/bin/make-ab", file, size], None)
+    libcalamares.utils.host_env_process_output(["/usr/share/calamares/make-ab", file, size], None)
     return None
 
 def run():
@@ -67,7 +67,7 @@ def run():
         size = entry["size"]
 
         if not os.path.exists(file):
-            libcalamares.utils.warning("The source filesystem \"{}\" does not exist".format(source))
+            libcalamares.utils.warning("The source filesystem \"{}\" does not exist".format(file))
             return (_("Bad make-ab configuration"),
                     _("The source file \"{}\" does not exist").format(file))
 

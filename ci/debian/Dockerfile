@@ -7,7 +7,7 @@ COPY . /calamares
 RUN apt update && apt upgrade -y
 
 # Install debhelper
-RUN yes | apt install -y debhelper cryptsetup pkg-kde-tools pkexec || :
+RUN yes | apt install -y debhelper cryptsetup pkg-kde-tools pkexec os-prober rsync || :
 
 # Create .orig tarball
 RUN tar -cJf calamares_3.10.1.orig.tar.xz calamares

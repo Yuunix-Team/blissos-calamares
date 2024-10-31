@@ -20,6 +20,7 @@ override_dh_auto_configure:
 override_dh_auto_install:
 	dh_auto_install -- || :
 	rm -rf debian/calamares/usr/include debian/calamares/usr/lib/*/cmake
+	cp -r src/scripts debian/calamares/usr/share/calamares
 
 # Some test don't work well, we don't need to run them at package build time.
 override_dh_auto_test:

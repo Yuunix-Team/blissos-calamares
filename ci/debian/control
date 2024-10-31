@@ -39,24 +39,24 @@ Build-Depends: debhelper-compat (= 13),
   qttools5-dev,
   qttools5-dev-tools
 Standards-Version: 4.6.2
-Homepage: <insert the upstream URL, if relevant>
+Homepage: https://github.com/yuunix-team/blissos-calamares
 #Vcs-Browser: https://salsa.debian.org/debian/calamares
 #Vcs-Git: https://salsa.debian.org/debian/calamares.git
 
 Package: calamares
 Architecture: linux-any
 Multi-Arch: foreign
-Depends: os-prober,
+Depends: os-prober, rsync
   ${shlibs:Depends},
   ${misc:Depends},
 Description: distribution-independent installer framework
- Calamares is a distribution-independent installer framework.
- .
- It provides a graphical installer that can be used with nearly
- any distribution. This package is suitable for live media on
- Debian-based systems, and won't be of any particular use on
- an already installed system.
- .
- You will likely want to provide your own config files to match
- your distribution, reading the Calamares documentation will guide
- you through that process.
+  Calamares is a distribution-independent installer framework.
+  .
+  It provides a graphical installer that can be used with nearly
+  any distribution. This package is suitable for live media on
+  Debian-based systems, and won't be of any particular use on
+  an already installed system.
+  .
+  You will likely want to provide your own config files to match
+  your distribution, reading the Calamares documentation will guide
+  you through that process.
