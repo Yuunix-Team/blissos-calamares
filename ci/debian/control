@@ -46,7 +46,7 @@ Homepage: https://github.com/yuunix-team/blissos-calamares
 Package: calamares
 Architecture: linux-any
 Multi-Arch: foreign
-Depends: os-prober, rsync
+Depends: os-prober, rsync,
   ${shlibs:Depends},
   ${misc:Depends},
 Description: distribution-independent installer framework
