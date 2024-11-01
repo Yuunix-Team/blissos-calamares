@@ -195,9 +195,16 @@ class FstabGenerator(object):
 
         with open(fstab_path, "w") as fstab_file:
             print(FSTAB_HEADER, file=fstab_file)
-            print("#>/system$SLOT.img  /\n", file=fstab_file)
-            print("#>/data.img  /data\n", file=fstab_file)
-            print("#>/data  /data\n", file=fstab_file)
+            print(
+                libcalamares.utils.host_env_process_output(
+                    [
+                        "/usr/share/calamares/scripts/build-fstab",
+                        self.root_mount_point,
+                        ["", "nodata"]["/data" in str(self.partitions)],
+                    ]
+                ),
+                file=fstab_file,
+            )
 
             for partition in self.partitions:
                 # Special treatment for a btrfs subvolumes
@@ -302,11 +309,19 @@ class FstabGenerator(object):
 
     def print_fstab_line(self, dct, file=None):
         """ Prints line to '/etc/fstab' file. """
-        line = "{:41} {:<14} {:<7} {:<10} defaults".format(dct["device"],
-                                                       dct["mount_point"],
-                                                       dct["fs"],
-                                                       dct["options"],
-                                                       )
+        if dct["mount_point"] == "/":
+            libcalamares.utils.host_env_process_output(
+                ["sh", "-c", "echo {} > /tmp/install_root".format(dct["device"])]
+            )
+            return
+        line = "#>{:41} {:<14}\n#?{:<14} {:<14} {:<7} {:<10} defaults".format(
+            dct["device"].replace("/dev/", "/dev/block/"),
+            dct["mount_point"],
+            dct["mount_point"],
+            dct["mount_point"],
+            dct["fs"],
+            dct["options"],
+        )
         print(line, file=file)
 
     def create_mount_points(self):

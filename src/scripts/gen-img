@@ -2,11 +2,21 @@
 
 dd if=/dev/zero of="$1/misc.img" bs=1 count=0 seek=10M
 
-mkdir -p "$1/data"
+mkdir -p "$1"/{data,boot}
 
-if ! mkdir -p "$1/DATA"; then
-  dd if=/dev/zero of="$1/data.img"bs=1 count=0 \
+if ! mkdir "$1"/DATA; then
+  dd if=/dev/zero of="$1"/data.img bs=1 count=0 \
     seek=$(($(busybox df -m "$1" | awk '{print $4}' | tail -1) - 4096))M
 fi
 
-rm -rf "$1/DATA"
+rm -rf "$1"/DATA
+
+{
+  # Grub configuration step
+  cp -r /cdrom/grub "$1"/boot
+  find "$1"/boot/grub -name TRANS.TBL -delete
+
+  cmdline="ROOT=$(cat /tmp/install_root) $(sed "s|\(initrd.*img\s*\)||; s|quiet\s*||; s|\(vga=\w\+\?\s*\)||; s|\(DPI=\w\+\?\s*\)||; s|\(AUTO_INSTALL=\w\+\?\s*\)||; s|\(INSTALL=\w\+\?\s*\)||; s|\(SRC=\S\+\?\s*\)||; s|\(DEBUG=\w\+\?\s*\)||; s|\(BOOT_IMAGE=\S\+\?\s*\)||; s|\(iso-scan/filename=\S\+\?\s*\)||; s|[[:space:]]*$||" /proc/cmdline) androidboot.slot_suffix=_a"
+
+  sed -i "s|VER|$VER|; s|CMDLINE|$cmdline|; s|OS_TITLE|$OS_TITLE|; s|/kernel|/kernel_a|; s|/initrd.img|/initrd_a.img|" "$1"/boot/grub/android.cfg
+}
