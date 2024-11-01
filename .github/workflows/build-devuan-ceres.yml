@@ -1,4 +1,4 @@
-name: Generate .deb
+name: Generate .deb (ceres)
 
 on:
   push:

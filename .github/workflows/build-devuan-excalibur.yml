@@ -1,4 +1,4 @@
-name: Generate .deb
+name: Generate .deb (excalibur)
 
 on:
   push:
