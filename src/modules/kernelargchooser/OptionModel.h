@@ -12,7 +12,7 @@
 #ifndef PACKAGEMODEL_H
 #define PACKAGEMODEL_H
 
-#include "PackageTreeItem.h"
+#include "OptionTreeItem.h"
 
 #include <functional>
 
@@ -25,7 +25,7 @@ namespace YAML
 class Node;
 }  // namespace YAML
 
-class PackageModel : public QAbstractItemModel
+class OptionModel : public QAbstractItemModel
 {
     Q_OBJECT
 
@@ -33,6 +33,7 @@ public:
     // Names for columns (unused in the code)
     static constexpr const int NameColumn = 0;
     static constexpr const int DescriptionColumn = 1;
+    static constexpr const int InputColumn = 2;
 
     /* The only interesting roles are DisplayRole (with text depending
      * on the column, and MetaExpandRole which tells if an index
@@ -40,13 +41,13 @@ public:
      */
     static constexpr const int MetaExpandRole = Qt::UserRole + 1;
 
-    explicit PackageModel( QObject* parent = nullptr );
-    ~PackageModel() override;
+    explicit OptionModel( QObject* parent = nullptr );
+    ~OptionModel() override;
 
     void setupModelData( const QVariantList& l );
 
     QVariant data( const QModelIndex& index, int role ) const override;
-    bool setData( const QModelIndex& index, const QVariant& value, int role = Qt::EditRole ) override;
+    bool setData( const QModelIndex& index, const QVariant& value, int role = Qt::DisplayRole ) override;
     Qt::ItemFlags flags( const QModelIndex& index ) const override;
 
     QModelIndex index( int row, int column, const QModelIndex& parent = QModelIndex() ) const override;
@@ -62,16 +63,16 @@ public:
      * checks if a group name matches any of the items in @p selectNames.
      * If a match is found, set check the box for that group and it's children.
      *
-     * Individual packages will not be matched.
+     * Individual options will not be matched.
      *
      */
     void setSelections( const QStringList& selectNames );
 
-    PackageTreeItem::List getPackages() const;
-    PackageTreeItem::List getItemPackages( PackageTreeItem* item ) const;
+    OptionTreeItem::List getOptions() const;
+    OptionTreeItem::List getItemOptions( OptionTreeItem* item ) const;
 
-    QStringList getPackageNames( PackageTreeItem* item ) const;
-    QStringList getPackageNames( const PackageTreeItem::List& itemList ) const;
+    QStringList getOptionNames( OptionTreeItem* item ) const;
+    QStringList getOptionNames( const OptionTreeItem::List& itemList ) const;
 
     /** @brief Appends groups to the tree
      *
@@ -91,12 +92,11 @@ public:
 private:
     friend class ItemTests;
 
-    void setupModelData( const QVariantList& l, PackageTreeItem* parent );
+    void setupModelData( const QVariantList& l, OptionTreeItem* parent );
 
     std::function<void(bool)> m_nextUpdateCall{};
 
-    PackageTreeItem* m_rootItem = nullptr;
-    PackageTreeItem::List m_hiddenItems;
+    OptionTreeItem* m_rootItem = nullptr;
 };
 
 #endif  // PACKAGEMODEL_H

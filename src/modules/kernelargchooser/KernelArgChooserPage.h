@@ -14,8 +14,8 @@
 #define NETINSTALLPAGE_H
 
 #include "Config.h"
-#include "PackageModel.h"
-#include "PackageTreeItem.h"
+#include "OptionModel.h"
+#include "OptionTreeItem.h"
 
 #include "locale/TranslatableConfiguration.h"
 
@@ -31,12 +31,12 @@ namespace Ui
 class Page_NetInst;
 }  // namespace Ui
 
-class NetInstallPage : public QWidget
+class KernelArgChooserPage : public QWidget
 {
     Q_OBJECT
 public:
-    NetInstallPage( Config* config, QWidget* parent = nullptr );
-    ~NetInstallPage() override;
+    KernelArgChooserPage( Config* config, QWidget* parent = nullptr );
+    ~KernelArgChooserPage() override;
 
     void onActivate();
 

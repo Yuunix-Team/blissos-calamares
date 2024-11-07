@@ -55,7 +55,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
     </widget>
    </item>
    <item>
-    <widget class="QLabel" name="netinst_status">
+    <widget class="QLabel" name="chooser_status">
      <property name="text">
       <string/>
      </property>

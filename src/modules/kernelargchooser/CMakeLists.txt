@@ -3,19 +3,19 @@
 #   SPDX-FileCopyrightText: 2020 Adriaan de Groot <groot@kde.org>
 #   SPDX-License-Identifier: BSD-2-Clause
 #
-calamares_add_plugin(netinstall
+calamares_add_plugin(kernelargchooser
     TYPE viewmodule
     EXPORT_MACRO PLUGINDLLEXPORT_PRO
     SOURCES
         Config.cpp
         groupstreeview.cpp
         LoaderQueue.cpp
-        NetInstallViewStep.cpp
-        NetInstallPage.cpp
-        PackageTreeItem.cpp
-        PackageModel.cpp
+        KernelArgChooserViewStep.cpp
+        KernelArgChooserPage.cpp
+        OptionTreeItem.cpp
+        OptionModel.cpp
     UI
-        page_netinst.ui
+        page_chooser.ui
     LINK_PRIVATE_LIBRARIES
         ${qtname}::Network
         ${qtname}::Widgets
@@ -24,8 +24,8 @@ calamares_add_plugin(netinstall
 
 if(TARGET ${kfname}::CoreAddons)
     #calamares_add_test(
-    #    netinstalltest
-    #    SOURCES Tests.cpp Config.cpp LoaderQueue.cpp PackageTreeItem.cpp PackageModel.cpp
+    #    kernelargchoosertest
+    #    SOURCES Tests.cpp Config.cpp LoaderQueue.cpp OptionTreeItem.cpp OptionModel.cpp
     #    LIBRARIES ${qtname}::Widgets ${qtname}::Gui ${qtname}::Network ${kfname}::CoreAddons
     #)
 endif()

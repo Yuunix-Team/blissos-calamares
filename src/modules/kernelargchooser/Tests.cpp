@@ -8,8 +8,8 @@
  */
 
 #include "Config.h"
-#include "PackageModel.h"
-#include "PackageTreeItem.h"
+#include "OptionModel.h"
+#include "OptionTreeItem.h"
 
 #include "utils/Logger.h"
 #include "utils/NamedEnum.h"
@@ -28,17 +28,17 @@ public:
     ~ItemTests() override {}
 
 private:
-    void checkAllSelected( PackageTreeItem* p );
-    void recursiveCompare( PackageTreeItem*, PackageTreeItem* );
-    void recursiveCompare( PackageModel&, PackageModel& );
+    void checkAllSelected( OptionTreeItem* p );
+    void recursiveCompare( OptionTreeItem*, OptionTreeItem* );
+    void recursiveCompare( OptionModel&, OptionModel& );
 
 private Q_SLOTS:
     void initTestCase();
 
     void testRoot();
 
-    void testPackage();
-    void testExtendedPackage();
+    void testOption();
+    void testExtendedOption();
 
     void testGroup();
     void testCompare();
@@ -60,7 +60,7 @@ ItemTests::initTestCase()
 void
 ItemTests::testRoot()
 {
-    PackageTreeItem r;
+    OptionTreeItem r;
 
     QCOMPARE( r.isSelected(), Qt::Checked );
     QCOMPARE( r.name(), QStringLiteral( "<root>" ) );
@@ -71,12 +71,12 @@ ItemTests::testRoot()
 }
 
 void
-ItemTests::testPackage()
+ItemTests::testOption()
 {
-    PackageTreeItem p( "bash", nullptr );
+    OptionTreeItem p( "bash", nullptr );
 
     QCOMPARE( p.isSelected(), Qt::Unchecked );
-    QCOMPARE( p.packageName(), QStringLiteral( "bash" ) );
+    QCOMPARE( p.optionName(), QStringLiteral( "bash" ) );
     QVERIFY( p.name().isEmpty() );  // not a group
     QVERIFY( p.description().isEmpty() );
     QCOMPARE( p.parentItem(), nullptr );
@@ -84,18 +84,18 @@ ItemTests::testPackage()
     QVERIFY( !p.isHidden() );
     QVERIFY( !p.isCritical() );
     QVERIFY( !p.isGroup() );
-    QVERIFY( p.isPackage() );
+    QVERIFY( p.isOption() );
     QVERIFY( p == p );
 
     // This doesn't happen in normal constructions,
-    // because a package can't have children.
-    PackageTreeItem c( "zsh", &p );
+    // because a option can't have children.
+    OptionTreeItem c( "zsh", &p );
     QCOMPARE( c.isSelected(), Qt::Unchecked );
-    QCOMPARE( c.packageName(), QStringLiteral( "zsh" ) );
+    QCOMPARE( c.optionName(), QStringLiteral( "zsh" ) );
     QVERIFY( c.name().isEmpty() );  // not a group
     QCOMPARE( c.parentItem(), &p );
     QVERIFY( !c.isGroup() );
-    QVERIFY( c.isPackage() );
+    QVERIFY( c.isOption() );
     QVERIFY( c == c );
     QVERIFY( c != p );
 
@@ -107,21 +107,21 @@ ItemTests::testPackage()
 static const char doc[] =
 "- name: \"CCR\"\n"
 "  description: \"Tools for the Chakra Community Repository\"\n"
-"  packages:\n"
+"  options:\n"
 "    - ccr\n"
 "    - base-devel\n"
 "    - bash\n";
 
-static const char doc_no_packages[] =
+static const char doc_no_options[] =
 "- name: \"CCR\"\n"
 "  description: \"Tools for the Chakra Community Repository\"\n"
-"  packages: []\n";
+"  options: []\n";
 
 static const char doc_with_expanded[] =
 "- name: \"CCR\"\n"
 "  description: \"Tools for the Chakra Community Repository\"\n"
 "  expanded: true\n"
-"  packages:\n"
+"  options:\n"
 "    - ccr\n"
 "    - base-devel\n"
 "    - bash\n";
@@ -129,19 +129,19 @@ static const char doc_with_expanded[] =
 // clang-format on
 
 void
-ItemTests::testExtendedPackage()
+ItemTests::testExtendedOption()
 {
     auto yamldoc = ::YAML::Load( doc );
     QVariantList yamlContents = Calamares::YAML::sequenceToVariant( yamldoc );
 
     QCOMPARE( yamlContents.length(), 1 );
 
-    // Kind of derpy, but we can treat a group as if it is a package
+    // Kind of derpy, but we can treat a group as if it is a option
     // because the keys name and description are the same
-    PackageTreeItem p( yamlContents[ 0 ].toMap(), PackageTreeItem::PackageTag { nullptr } );
+    OptionTreeItem p( yamlContents[ 0 ].toMap(), OptionTreeItem::OptionTag { nullptr } );
 
     QCOMPARE( p.isSelected(), Qt::Unchecked );
-    QCOMPARE( p.packageName(), QStringLiteral( "CCR" ) );
+    QCOMPARE( p.optionName(), QStringLiteral( "CCR" ) );
     QVERIFY( p.name().isEmpty() );  // not a group
     QVERIFY( !p.description().isEmpty() );  // because it is set
     QVERIFY( p.description().startsWith( QStringLiteral( "Tools for the Chakra" ) ) );
@@ -150,7 +150,7 @@ ItemTests::testExtendedPackage()
     QVERIFY( !p.isHidden() );
     QVERIFY( !p.isCritical() );
     QVERIFY( !p.isGroup() );
-    QVERIFY( p.isPackage() );
+    QVERIFY( p.isOption() );
     QVERIFY( p == p );
 }
 
@@ -162,29 +162,29 @@ ItemTests::testGroup()
 
     QCOMPARE( yamlContents.length(), 1 );
 
-    PackageTreeItem p( yamlContents[ 0 ].toMap(), PackageTreeItem::GroupTag { nullptr } );
+    OptionTreeItem p( yamlContents[ 0 ].toMap(), OptionTreeItem::GroupTag { nullptr } );
     QCOMPARE( p.name(), QStringLiteral( "CCR" ) );
-    QVERIFY( p.packageName().isEmpty() );
+    QVERIFY( p.optionName().isEmpty() );
     QVERIFY( p.description().startsWith( QStringLiteral( "Tools " ) ) );
     QCOMPARE( p.parentItem(), nullptr );
     QVERIFY( !p.isHidden() );
     QVERIFY( !p.isCritical() );
-    // The item-constructor doesn't consider the packages: list
+    // The item-constructor doesn't consider the options: list
     QCOMPARE( p.childCount(), 0 );
     QVERIFY( p.isGroup() );
-    QVERIFY( !p.isPackage() );
+    QVERIFY( !p.isOption() );
     QVERIFY( p == p );
 
-    PackageTreeItem c( "zsh", nullptr );  // Single string, package
+    OptionTreeItem c( "zsh", nullptr );  // Single string, option
     QVERIFY( p != c );
 }
 
 void
 ItemTests::testCompare()
 {
-    PackageTreeItem p0( "bash", nullptr );
-    PackageTreeItem p1( "bash", &p0 );
-    PackageTreeItem p2( "bash", nullptr );
+    OptionTreeItem p0( "bash", nullptr );
+    OptionTreeItem p1( "bash", &p0 );
+    OptionTreeItem p2( "bash", nullptr );
 
     QVERIFY( p0 == p1 );  // Parent doesn't matter
     QVERIFY( p0 == p2 );
@@ -194,40 +194,40 @@ ItemTests::testCompare()
     QVERIFY( p0 == p1 );  // Neither does selected state
     QVERIFY( p0 == p2 );
 
-    PackageTreeItem r0( nullptr );
+    OptionTreeItem r0( nullptr );
     QVERIFY( p0 != r0 );
     QVERIFY( p1 != r0 );
     QVERIFY( r0 == r0 );
-    PackageTreeItem r1( nullptr );
+    OptionTreeItem r1( nullptr );
     QVERIFY( r0 == r1 );  // Different roots are still equal
 
-    PackageTreeItem r2( "<root>", nullptr );  // Fake root
+    OptionTreeItem r2( "<root>", nullptr );  // Fake root
     QVERIFY( r0 != r2 );
     QVERIFY( r1 != r2 );
     QVERIFY( p0 != r2 );
-    PackageTreeItem r3( "<root>", nullptr );
+    OptionTreeItem r3( "<root>", nullptr );
     QVERIFY( r3 == r2 );
 
     auto yamldoc = ::YAML::Load( doc );  // See testGroup()
     QVariantList yamlContents = Calamares::YAML::sequenceToVariant( yamldoc );
     QCOMPARE( yamlContents.length(), 1 );
 
-    PackageTreeItem p3( yamlContents[ 0 ].toMap(), PackageTreeItem::GroupTag { nullptr } );
+    OptionTreeItem p3( yamlContents[ 0 ].toMap(), OptionTreeItem::GroupTag { nullptr } );
     QVERIFY( p3 == p3 );
     QVERIFY( p3 != p1 );
     QVERIFY( p1 != p3 );
-    QCOMPARE( p3.childCount(), 0 );  // Doesn't load the packages: list
+    QCOMPARE( p3.childCount(), 0 );  // Doesn't load the options: list
 
-    PackageTreeItem p4( Calamares::YAML::sequenceToVariant( YAML::Load( doc ) )[ 0 ].toMap(),
-                        PackageTreeItem::GroupTag { nullptr } );
+    OptionTreeItem p4( Calamares::YAML::sequenceToVariant( YAML::Load( doc ) )[ 0 ].toMap(),
+                        OptionTreeItem::GroupTag { nullptr } );
     QVERIFY( p3 == p4 );
-    PackageTreeItem p5( Calamares::YAML::sequenceToVariant( YAML::Load( doc_no_packages ) )[ 0 ].toMap(),
-                        PackageTreeItem::GroupTag { nullptr } );
+    OptionTreeItem p5( Calamares::YAML::sequenceToVariant( YAML::Load( doc_no_options ) )[ 0 ].toMap(),
+                        OptionTreeItem::GroupTag { nullptr } );
     QVERIFY( p3 == p5 );
 }
 
 void
-ItemTests::checkAllSelected( PackageTreeItem* p )
+ItemTests::checkAllSelected( OptionTreeItem* p )
 {
     QVERIFY( p->isSelected() );
     for ( int i = 0; i < p->childCount(); ++i )
@@ -237,7 +237,7 @@ ItemTests::checkAllSelected( PackageTreeItem* p )
 }
 
 void
-ItemTests::recursiveCompare( PackageTreeItem* l, PackageTreeItem* r )
+ItemTests::recursiveCompare( OptionTreeItem* l, OptionTreeItem* r )
 {
     QVERIFY( l && r );
     QVERIFY( *l == *r );
@@ -251,7 +251,7 @@ ItemTests::recursiveCompare( PackageTreeItem* l, PackageTreeItem* r )
 }
 
 void
-ItemTests::recursiveCompare( PackageModel& l, PackageModel& r )
+ItemTests::recursiveCompare( OptionModel& l, OptionModel& r )
 {
     return recursiveCompare( l.m_rootItem, r.m_rootItem );
 }
@@ -263,38 +263,38 @@ ItemTests::testModel()
     QVariantList yamlContents = Calamares::YAML::sequenceToVariant( yamldoc );
     QCOMPARE( yamlContents.length(), 1 );
 
-    PackageModel m0( nullptr );
+    OptionModel m0( nullptr );
     m0.setupModelData( yamlContents );
 
     QCOMPARE( m0.m_hiddenItems.count(), 0 );  // Nothing hidden
-    QCOMPARE( m0.rowCount(), 1 );  // Group, the packages are invisible
-    QCOMPARE( m0.rowCount( m0.index( 0, 0 ) ), 3 );  // The packages
+    QCOMPARE( m0.rowCount(), 1 );  // Group, the options are invisible
+    QCOMPARE( m0.rowCount( m0.index( 0, 0 ) ), 3 );  // The options
 
     checkAllSelected( m0.m_rootItem );
 
-    PackageModel m2( nullptr );
+    OptionModel m2( nullptr );
     m2.setupModelData( Calamares::YAML::sequenceToVariant( YAML::Load( doc_with_expanded ) ) );
     QCOMPARE( m2.m_hiddenItems.count(), 0 );
-    QCOMPARE( m2.rowCount(), 1 );  // Group, now the packages expanded but not counted
-    QCOMPARE( m2.rowCount( m2.index( 0, 0 ) ), 3 );  // The packages
+    QCOMPARE( m2.rowCount(), 1 );  // Group, now the options expanded but not counted
+    QCOMPARE( m2.rowCount( m2.index( 0, 0 ) ), 3 );  // The options
     checkAllSelected( m2.m_rootItem );
 
-    PackageTreeItem r;
+    OptionTreeItem r;
     QVERIFY( r == *m0.m_rootItem );
 
     QCOMPARE( m0.m_rootItem->childCount(), 1 );
 
-    PackageTreeItem* group = m0.m_rootItem->child( 0 );
+    OptionTreeItem* group = m0.m_rootItem->child( 0 );
     QVERIFY( group->isGroup() );
     QCOMPARE( group->name(), QStringLiteral( "CCR" ) );
     QCOMPARE( group->childCount(), 3 );
 
-    PackageTreeItem bash( "bash", nullptr );
-    // Check that the sub-packages loaded correctly
+    OptionTreeItem bash( "bash", nullptr );
+    // Check that the sub-options loaded correctly
     bool found_one_bash = false;
     for ( int i = 0; i < group->childCount(); ++i )
     {
-        QVERIFY( group->child( i )->isPackage() );
+        QVERIFY( group->child( i )->isOption() );
         if ( bash == *( group->child( i ) ) )
         {
             found_one_bash = true;
@@ -309,11 +309,11 @@ ItemTests::testModel()
 void
 ItemTests::testExampleFiles()
 {
-    QVERIFY( QStringLiteral( BUILD_AS_TEST ).endsWith( "/netinstall" ) );
+    QVERIFY( QStringLiteral( BUILD_AS_TEST ).endsWith( "/kernelargchooser" ) );
 
     QDir d( BUILD_AS_TEST );
 
-    for ( const QString& filename : QStringList { "netinstall.yaml" } )
+    for ( const QString& filename : QStringList { "kernelargchooser.yaml" } )
     {
         QFile f( d.filePath( filename ) );
         QVERIFY( f.exists() );
@@ -324,7 +324,7 @@ ItemTests::testExampleFiles()
         YAML::Node yamldoc = YAML::Load( contents.constData() );
         QVariantList yamlContents = Calamares::YAML::sequenceToVariant( yamldoc );
 
-        PackageModel m1( nullptr );
+        OptionModel m1( nullptr );
         m1.setupModelData( yamlContents );
 
         // TODO: should test *something* about this file :/

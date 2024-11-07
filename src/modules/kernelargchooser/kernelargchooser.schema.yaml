@@ -1,0 +1,85 @@
+# SPDX-FileCopyrightText: 2020 Adriaan de Groot <groot@kde.org>
+# SPDX-FileContributor: benne-dee ( worked on groups schema )
+# SPDX-License-Identifier: GPL-3.0-or-later
+---
+$schema: https://json-schema.org/draft-07/schema#
+$id: https://calamares.io/schemas/kernelargchooser
+definitions:
+    option:
+        type: object
+        description: bare option - actual option id as passed to the option manager.
+        properties:
+            name: { type: string }
+            description: { type: string }
+            selected: { type: boolean, default: false }
+            editable: { type: boolean, default: false }
+            range-min: { type: number } # for input
+            range-max: { type: number }
+        required: [name, description]
+    group:
+        type: object
+        description: Longer discussion in `kernelargchooser.conf` file under 'Groups Format'
+        properties:
+            name: { type: string }
+            description: { type: string }
+            options:
+                type: array
+                items: { $ref: "#/definitions/option" }
+            hidden: { type: boolean, default: false }
+            selected: { type: boolean, default: false }
+            distinct: { type: boolean, default: false }
+            critical: { type: boolean, default: false }
+            immutable: { type: boolean }
+            noncheckable: { type: boolean }
+            expanded: { type: boolean }
+            subgroups:
+                type: array
+                items: { $ref: "#/definitions/group" }
+            pre-install:
+                type: string
+                description: an optional command to run within the new system before the group's
+                    options are installed. It will run before **each** option in the group
+                    is installed.
+            post-install:
+                type: string
+                description: an optional command to run within the new system after the group's
+                    options are installed. It will run after **each** option in the group
+                    is installed.
+        required: [name, description] # Always required, at any level in the subgroups hirearchy
+        if:
+            properties:
+                subgroups:
+                    maxItems: 0
+        then:
+            required: [name, description, options] # bottom-most (sub)group requires some option (otherwise, why bother?)
+    groups:
+        type: array
+        items: { $ref: "#/definitions/group" }
+
+oneOf:
+    - # kernelargchooser.conf
+      type: object
+      description: kernelargchooser.conf schema
+      additionalProperties: false
+      properties:
+          groupsUrl: { type: string }
+          required: { type: boolean, default: false }
+          label: # Translatable labels
+              type: object
+              additionalProperties: true
+              properties:
+                  sidebar: { type: string }
+                  title: { type: string }
+          groups: { $ref: "#/definitions/groups" }
+      required: [groupsUrl]
+
+    - # Groups file with top level *groups* key
+      type: object
+      description: Groups file with top level *groups* key
+      additionalProperties: false
+      properties:
+          groups: { $ref: "#/definitions/groups" }
+      required: [groups]
+
+    - # Groups file bare
+      { $ref: "#/definitions/groups" }

@@ -9,7 +9,7 @@
  *
  */
 
-#include "PackageModel.h"
+#include "OptionModel.h"
 
 #include "compat/Variant.h"
 #include "utils/Logger.h"
@@ -24,11 +24,11 @@
 
 #include <QMessageBox>
 
-static bool gShowConfError{};
+static bool gShowConfError {};
 
 /// Recursive helper for setSelections()
 static void
-setSelections( const QStringList& selectNames, PackageTreeItem* item )
+setSelections( const QStringList& selectNames, OptionTreeItem* item )
 {
     for ( int i = 0; i < item->childCount(); i++ )
     {
@@ -64,60 +64,62 @@ collectSources( const QVariantList& groupList )
 }
 
 QStringList
-PackageModel::getPackageNames( PackageTreeItem* item ) const
+OptionModel::getOptionNames( OptionTreeItem* item ) const
 {
-    QStringList packageNames;
-    if ( item->isPackage() )  // package
+    QStringList optionNames;
+    if ( item->isOption() )  // option
     {
-        packageNames << item->packageName();
+        optionNames << item->optionName();
     }
     else
     {
-        const auto itemPackages = getItemPackages( item );
-        for ( const auto& itemPackage : itemPackages ) {
-            packageNames << getPackageNames( itemPackage );
+        const auto itemOptions = getItemOptions( item );
+        for ( const auto& itemOption : itemOptions )
+        {
+            optionNames << getOptionNames( itemOption );
         }
     }
 
-    return packageNames;
+    return optionNames;
 }
 
 QStringList
-PackageModel::getPackageNames( const PackageTreeItem::List& itemList ) const
+OptionModel::getOptionNames( const OptionTreeItem::List& itemList ) const
 {
-    QStringList packageNames;
-    for ( const auto& itemPackage : itemList ) {
-        packageNames << getPackageNames( itemPackage );
+    QStringList optionNames;
+    for ( const auto& itemOption : itemList )
+    {
+        optionNames << getOptionNames( itemOption );
     }
 
-    return packageNames;
+    return optionNames;
 }
 
 void
-PackageModel::setUpdateNextCall( std::function<void(bool)> fn )
+OptionModel::setUpdateNextCall( std::function< void( bool ) > fn )
 {
     m_nextUpdateCall = std::move( fn );
 }
 
-PackageModel::PackageModel( QObject* parent )
+OptionModel::OptionModel( QObject* parent )
     : QAbstractItemModel( parent )
 {
 }
 
-PackageModel::~PackageModel()
+OptionModel::~OptionModel()
 {
     delete m_rootItem;
 }
 
 QModelIndex
-PackageModel::index( int row, int column, const QModelIndex& parent ) const
+OptionModel::index( int row, int column, const QModelIndex& parent ) const
 {
     if ( !m_rootItem || !hasIndex( row, column, parent ) )
     {
         return QModelIndex();
     }
 
-    PackageTreeItem* parentItem;
+    OptionTreeItem* parentItem;
 
     if ( !parent.isValid() )
     {
@@ -125,10 +127,10 @@ PackageModel::index( int row, int column, const QModelIndex& parent ) const
     }
     else
     {
-        parentItem = static_cast< PackageTreeItem* >( parent.internalPointer() );
+        parentItem = static_cast< OptionTreeItem* >( parent.internalPointer() );
     }
 
-    PackageTreeItem* childItem = parentItem->child( row );
+    OptionTreeItem* childItem = parentItem->child( row );
     if ( childItem )
     {
         return createIndex( row, column, childItem );
@@ -140,15 +142,15 @@ PackageModel::index( int row, int column, const QModelIndex& parent ) const
 }
 
 QModelIndex
-PackageModel::parent( const QModelIndex& index ) const
+OptionModel::parent( const QModelIndex& index ) const
 {
     if ( !m_rootItem || !index.isValid() )
     {
         return QModelIndex();
     }
 
-    PackageTreeItem* child = static_cast< PackageTreeItem* >( index.internalPointer() );
-    PackageTreeItem* parent = child->parentItem();
+    OptionTreeItem* child = static_cast< OptionTreeItem* >( index.internalPointer() );
+    OptionTreeItem* parent = child->parentItem();
 
     if ( parent == m_rootItem )
     {
@@ -158,56 +160,58 @@ PackageModel::parent( const QModelIndex& index ) const
 }
 
 int
-PackageModel::rowCount( const QModelIndex& parent ) const
+OptionModel::rowCount( const QModelIndex& parent ) const
 {
     if ( !m_rootItem || ( parent.column() > 0 ) )
     {
         return 0;
     }
 
-    PackageTreeItem* parentItem;
+    OptionTreeItem* parentItem;
     if ( !parent.isValid() )
     {
         parentItem = m_rootItem;
     }
     else
     {
-        parentItem = static_cast< PackageTreeItem* >( parent.internalPointer() );
+        parentItem = static_cast< OptionTreeItem* >( parent.internalPointer() );
     }
 
     return parentItem->childCount();
 }
 
 int
-PackageModel::columnCount( const QModelIndex& ) const
+OptionModel::columnCount( const QModelIndex& ) const
 {
-    return 2;
+    return 3;
 }
 
 QVariant
-PackageModel::data( const QModelIndex& index, int role ) const
+OptionModel::data( const QModelIndex& index, int role ) const
 {
     if ( !m_rootItem || !index.isValid() )
     {
         return QVariant();
     }
 
-    PackageTreeItem* item = static_cast< PackageTreeItem* >( index.internalPointer() );
+    OptionTreeItem* item = static_cast< OptionTreeItem* >( index.internalPointer() );
     switch ( role )
     {
     case Qt::CheckStateRole:
         return index.column() == NameColumn ? ( item->isImmutable() ? QVariant() : item->isSelected() ) : QVariant();
     case Qt::DisplayRole:
-        return item->isHidden() ? QVariant() : item->data( index.column() );
+        return item->data( index.column() );
     case MetaExpandRole:
-        return item->isHidden() ? false : item->expandOnStart();
+        return item->expandOnStart();
+    case Qt::EditRole:
+        return item->isEditable() ? item->data( index.column() ) : QVariant();
     default:
         return QVariant();
     }
 }
 
 bool
-PackageModel::setData( const QModelIndex& index, const QVariant& value, int role )
+OptionModel::setData( const QModelIndex& index, const QVariant& value, int role )
 {
     if ( !m_rootItem )
     {
@@ -216,53 +220,34 @@ PackageModel::setData( const QModelIndex& index, const QVariant& value, int role
 
     if ( role == Qt::CheckStateRole && index.isValid() )
     {
-        PackageTreeItem* item = static_cast< PackageTreeItem* >( index.internalPointer() );
+        OptionTreeItem* item = static_cast< OptionTreeItem* >( index.internalPointer() );
         const auto checkedStateInfo = static_cast< Qt::CheckState >( value.toInt() );
         item->setSelected( checkedStateInfo );
-
-        auto filteredPkgNames = getPackageNames( getPackages() )
-            .filter( "blissos-" )
-            .filter( "-settings" );
-        const auto dotfilesCount = [](auto&& packageNames) {
-            using namespace std::string_view_literals;
-            static constexpr std::array kDotfilePackages{"blissos-gnome-settings"sv, "blissos-hyprland-settings"sv, "blissos-i3wm-settings"sv, "blissos-kde-settings"sv,
-                                                         "blissos-openbox-settings"sv, "blissos-qtile-settings"sv, "blissos-wayfire-settings"sv, "blissos-xfce-settings"sv};
-
-            size_t dotfilesCount{};
-            for ( auto&& packageName : packageNames ) {
-                const auto pkgnameBytes = std::string_view{ packageName.toUtf8() };
-                if ( std::find(kDotfilePackages.begin(), kDotfilePackages.end(), pkgnameBytes ) != kDotfilePackages.end() ) {
-                    ++dotfilesCount;
-                }
-            }
-            return dotfilesCount;
-        }( std::move( filteredPkgNames ) );
-
-        if ( dotfilesCount > 1 && checkedStateInfo == Qt::CheckState::Checked ) {
-            m_nextUpdateCall( false );
-
-            if ( !gShowConfError ) {
-                QMessageBox mb( QMessageBox::Critical,
-                                tr( "Multiple Environments selected" ),
-                                tr( "Oops! Can't Move Forward\nIt seems you've selected multiple Desktop Environments/Window Managers. To continue, kindly uncheck the DE/WM settings package or the entire group. Thank you!" ),
-                                QMessageBox::Ok );
-                Calamares::fixButtonLabels( &mb );
-                mb.exec();
-                gShowConfError = true;
-            }
-        } else if ( dotfilesCount <= 1 ) {
-            m_nextUpdateCall( true );
-        }
 
         emit dataChanged( this->index( 0, 0 ),
                           index.sibling( index.column(), index.row() + 1 ),
                           QVector< int >( Qt::CheckStateRole ) );
     }
+    else if ( role == Qt::EditRole && index.isValid() )
+    {
+        OptionTreeItem* item = static_cast< OptionTreeItem* >( index.internalPointer() );
+        if ( !item->isEditable() )
+        {
+            return true;
+        }
+
+        const auto inputString = static_cast< QString >( value.toString() );
+        item->setInput( inputString );
+
+        emit dataChanged(
+            this->index( 0, 0 ), index.sibling( index.column(), index.row() + 1 ), QVector< int >( Qt::EditRole ) );
+        return true;
+    }
     return true;
 }
 
 Qt::ItemFlags
-PackageModel::flags( const QModelIndex& index ) const
+OptionModel::flags( const QModelIndex& index ) const
 {
     if ( !m_rootItem || !index.isValid() )
     {
@@ -270,28 +255,40 @@ PackageModel::flags( const QModelIndex& index ) const
     }
     if ( index.column() == NameColumn )
     {
-        PackageTreeItem* item = static_cast< PackageTreeItem* >( index.internalPointer() );
-        if ( item->isImmutable() || item->isNoncheckable() )
-        {
-            return QAbstractItemModel::flags( index );  //Qt::NoItemFlags;
-        }
-        return Qt::ItemIsUserCheckable | QAbstractItemModel::flags( index );
+        OptionTreeItem* item = static_cast< OptionTreeItem* >( index.internalPointer() );
+        return item->isImmutable() || item->isNoncheckable()
+            ? QAbstractItemModel::flags( index )
+            : Qt::ItemIsUserCheckable | QAbstractItemModel::flags( index );
+    }
+    if ( index.column() == InputColumn )
+    {
+        return static_cast< OptionTreeItem* >( index.internalPointer() )->isEditable()
+            ? Qt::ItemIsEditable | QAbstractItemModel::flags( index )
+            : QAbstractItemModel::flags( index );
     }
     return QAbstractItemModel::flags( index );
 }
 
 QVariant
-PackageModel::headerData( int section, Qt::Orientation orientation, int role ) const
+OptionModel::headerData( int section, Qt::Orientation orientation, int role ) const
 {
     if ( orientation == Qt::Horizontal && role == Qt::DisplayRole )
     {
-        return ( section == NameColumn ) ? tr( "Name" ) : tr( "Description" );
+        switch ( section )
+        {
+        case NameColumn:
+            return tr( "Name" );
+        case DescriptionColumn:
+            return tr( "Description" );
+        default:
+            return tr( "Input (Optional)" );
+        }
     }
     return QVariant();
 }
 
 void
-PackageModel::setSelections( const QStringList& selectNames )
+OptionModel::setSelections( const QStringList& selectNames )
 {
     if ( m_rootItem )
     {
@@ -299,29 +296,16 @@ PackageModel::setSelections( const QStringList& selectNames )
     }
 }
 
-PackageTreeItem::List
-PackageModel::getPackages() const
+OptionTreeItem::List
+OptionModel::getOptions() const
 {
-    if ( !m_rootItem )
-    {
-        return PackageTreeItem::List();
-    }
-
-    auto items = getItemPackages( m_rootItem );
-    for ( auto package : m_hiddenItems )
-    {
-        if ( package->hiddenSelected() )
-        {
-            items.append( getItemPackages( package ) );
-        }
-    }
-    return items;
+    return m_rootItem ? getItemOptions( m_rootItem ) : OptionTreeItem::List();
 }
 
-PackageTreeItem::List
-PackageModel::getItemPackages( PackageTreeItem* item ) const
+OptionTreeItem::List
+OptionModel::getItemOptions( OptionTreeItem* item ) const
 {
-    PackageTreeItem::List selectedPackages;
+    OptionTreeItem::List selectedOptions;
     for ( int i = 0; i < item->childCount(); i++ )
     {
         auto* child = item->child( i );
@@ -330,20 +314,20 @@ PackageModel::getItemPackages( PackageTreeItem* item ) const
             continue;
         }
 
-        if ( child->isPackage() )  // package
+        if ( child->isOption() )  // option
         {
-            selectedPackages.append( child );
+            selectedOptions.append( child );
         }
         else
         {
-            selectedPackages.append( getItemPackages( child ) );
+            selectedOptions.append( getItemOptions( child ) );
         }
     }
-    return selectedPackages;
+    return selectedOptions;
 }
 
 void
-PackageModel::setupModelData( const QVariantList& groupList, PackageTreeItem* parent )
+OptionModel::setupModelData( const QVariantList& groupList, OptionTreeItem* parent )
 {
     for ( const auto& group : groupList )
     {
@@ -353,31 +337,31 @@ PackageModel::setupModelData( const QVariantList& groupList, PackageTreeItem* pa
             continue;
         }
 
-        PackageTreeItem* item = new PackageTreeItem( groupMap, PackageTreeItem::GroupTag { parent } );
+        OptionTreeItem* item = new OptionTreeItem( groupMap, OptionTreeItem::GroupTag { parent } );
         if ( groupMap.contains( "selected" ) )
         {
             item->setSelected( Calamares::getBool( groupMap, "selected", false ) ? Qt::Checked : Qt::Unchecked );
         }
-        if ( groupMap.contains( "packages" ) )
+        if ( groupMap.contains( "options" ) )
         {
-            for ( const auto& packageName : groupMap.value( "packages" ).toList() )
+            for ( const auto& optionName : groupMap.value( "options" ).toList() )
             {
-                if ( Calamares::typeOf( packageName ) == Calamares::StringVariantType )
+                if ( Calamares::typeOf( optionName ) == Calamares::StringVariantType )
                 {
-                    item->appendChild( new PackageTreeItem( packageName.toString(), item ) );
+                    item->appendChild( new OptionTreeItem( optionName.toString(), item ) );
                 }
                 else
                 {
-                    QVariantMap m = packageName.toMap();
+                    QVariantMap m = optionName.toMap();
                     if ( !m.isEmpty() )
                     {
-                        item->appendChild( new PackageTreeItem( m, PackageTreeItem::PackageTag { item } ) );
+                        item->appendChild( new OptionTreeItem( m, OptionTreeItem::OptionTag { item } ) );
                     }
                 }
             }
             if ( !item->childCount() )
             {
-                cWarning() << "*packages* under" << item->name() << "is empty.";
+                cWarning() << "*options* under" << item->name() << "is empty.";
             }
         }
         if ( groupMap.contains( "subgroups" ) )
@@ -412,35 +396,23 @@ PackageModel::setupModelData( const QVariantList& groupList, PackageTreeItem* pa
                 }
             }
         }
-        if ( item->isHidden() )
-        {
-            m_hiddenItems.append( item );
-            if ( !item->isSelected() )
-            {
-                cWarning() << "Item" << ( item->parentItem() ? item->parentItem()->name() : QString() ) << '.'
-                           << item->name() << "is hidden, but not selected.";
-            }
-        }
-        else
-        {
-            item->setCheckable( true );
-            parent->appendChild( item );
-        }
+        item->setCheckable( true );
+        parent->appendChild( item );
     }
 }
 
 void
-PackageModel::setupModelData( const QVariantList& l )
+OptionModel::setupModelData( const QVariantList& l )
 {
     beginResetModel();
     delete m_rootItem;
-    m_rootItem = new PackageTreeItem();
+    m_rootItem = new OptionTreeItem();
     setupModelData( l, m_rootItem );
     endResetModel();
 }
 
 void
-PackageModel::appendModelData( const QVariantList& groupList )
+OptionModel::appendModelData( const QVariantList& groupList )
 {
     if ( m_rootItem )
     {
@@ -454,7 +426,7 @@ PackageModel::appendModelData( const QVariantList& groupList )
             QList< int > removeList;
             for ( int i = 0; i < m_rootItem->childCount(); i++ )
             {
-                PackageTreeItem* child = m_rootItem->child( i );
+                OptionTreeItem* child = m_rootItem->child( i );
                 if ( sources.contains( child->source() ) )
                 {
                     removeList.insert( 0, i );

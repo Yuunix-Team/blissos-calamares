@@ -6,33 +6,33 @@
   hidden: false
   selected: true
   critical: false
-  packages:
+  options:
     - base
 - name: "Two"
   description: "group 2"
   hidden: false
   selected: true
   critical: false
-  packages:
+  options:
     - chakra-live-two
 - name: "Three"
   description: "group 3"
   hidden: false
   selected: true
   critical: false
-  packages:
+  options:
     - chakra-live-three
 - name: "Four"
   description: "group 4"
   hidden: false
   selected: true
   critical: false
-  packages:
+  options:
     - chakra-live-four
 - name: "Five"
   description: "group 5"
   hidden: false
   selected: true
   critical: false
-  packages:
+  options:
     - chakra-live-five

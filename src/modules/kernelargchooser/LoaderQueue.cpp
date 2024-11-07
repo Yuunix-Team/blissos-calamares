@@ -127,7 +127,7 @@ LoaderQueue::fetch( const QUrl& url )
 
     using namespace Calamares::Network;
 
-    cDebug() << "NetInstall loading groups from" << url;
+    cDebug() << "KernelArgChooser loading groups from" << url;
     QNetworkReply* reply = Manager().asynchronousGet(
         url,
         RequestOptions( RequestOptions::FakeUserAgent | RequestOptions::FollowRedirect, std::chrono::seconds( 30 ) ) );
@@ -155,12 +155,12 @@ LoaderQueue::dataArrived()
 
     if ( !m_reply || !m_reply->isFinished() )
     {
-        cWarning() << "NetInstall data called too early.";
+        cWarning() << "KernelArgChooser data called too early.";
         m_config->setStatus( Config::Status::FailedInternalError );
         return;
     }
 
-    cDebug() << "NetInstall group data received" << m_reply->size() << "bytes from" << m_reply->url();
+    cDebug() << "KernelArgChooser group data received" << m_reply->size() << "bytes from" << m_reply->url();
 
     cqDeleter< QNetworkReply > d { m_reply };
 
@@ -168,8 +168,8 @@ LoaderQueue::dataArrived()
     // even if the reply is corrupt or missing.
     if ( m_reply->error() != QNetworkReply::NoError )
     {
-        cWarning() << "unable to fetch netinstall package lists.";
-        cDebug() << Logger::SubEntry << "Netinstall reply error: " << m_reply->error();
+        cWarning() << "unable to fetch kernelargchooser option lists.";
+        cDebug() << Logger::SubEntry << "KernelArgChooser reply error: " << m_reply->error();
         cDebug() << Logger::SubEntry << "Request for url: " << m_reply->url().toString()
                  << " failed with: " << m_reply->errorString();
         m_config->setStatus( Config::Status::FailedNetworkError );
@@ -194,12 +194,12 @@ LoaderQueue::dataArrived()
         }
         else
         {
-            cWarning() << "NetInstall groups data does not form a sequence.";
+            cWarning() << "KernelArgChooser groups data does not form a sequence.";
         }
     }
     catch ( ::YAML::Exception& e )
     {
-        Calamares::YAML::explainException( e, yamlData, "netinstall groups data" );
+        Calamares::YAML::explainException( e, yamlData, "kernelargchooser groups data" );
         m_config->setStatus( Config::Status::FailedBadData );
     }
 }

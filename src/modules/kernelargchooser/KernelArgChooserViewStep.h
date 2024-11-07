@@ -20,15 +20,15 @@
 
 #include <QVariant>
 
-class NetInstallPage;
+class KernelArgChooserPage;
 
-class PLUGINDLLEXPORT NetInstallViewStep : public Calamares::ViewStep
+class PLUGINDLLEXPORT KernelArgChooserViewStep : public Calamares::ViewStep
 {
     Q_OBJECT
 
 public:
-    explicit NetInstallViewStep( QObject* parent = nullptr );
-    ~NetInstallViewStep() override;
+    explicit KernelArgChooserViewStep( QObject* parent = nullptr );
+    ~KernelArgChooserViewStep() override;
 
     QString prettyName() const override;
 
@@ -44,7 +44,7 @@ public:
 
     void onActivate() override;
 
-    // Leaving the page; store all selected packages for later installation.
+    // Leaving the page; store all selected options for later installation.
     void onLeave() override;
 
     void setConfigurationMap( const QVariantMap& configurationMap ) override;
@@ -57,10 +57,10 @@ public slots:
 private:
     Config m_config;
 
-    NetInstallPage* m_widget;
+    KernelArgChooserPage* m_widget;
     bool m_nextEnabled = false;
 };
 
-CALAMARES_PLUGIN_FACTORY_DECLARATION( NetInstallViewStepFactory )
+CALAMARES_PLUGIN_FACTORY_DECLARATION( KernelArgChooserViewStepFactory )
 
 #endif  // NETINSTALLVIEWSTEP_H

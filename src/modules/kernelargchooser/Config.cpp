@@ -27,7 +27,7 @@
 
 Config::Config( QObject* parent )
     : QObject( parent )
-    , m_model( new PackageModel( this ) )
+    , m_model( new OptionModel( this ) )
 {
     CALAMARES_RETRANSLATE_SLOT( &Config::retranslate );
 }
@@ -56,9 +56,9 @@ Config::status() const
     case Status::FailedInternalError:
         return tr( "Network Installation. (Disabled: Internal error)" );
     case Status::FailedNetworkError:
-        return tr( "Network Installation. (Disabled: Unable to fetch package lists, check your network connection)" );
+        return tr( "Network Installation. (Disabled: Unable to fetch option lists, check your network connection)" );
     case Status::FailedNoData:
-        return tr( "Network Installation. (Disabled: No package list)" );
+        return tr( "Network Installation. (Disabled: No option list)" );
     }
     __builtin_unreachable();
 }
@@ -73,7 +73,7 @@ Config::setStatus( Status s )
 QString
 Config::sidebarLabel() const
 {
-    return m_sidebarLabel ? m_sidebarLabel->get() : tr( "Package selection" );
+    return m_sidebarLabel ? m_sidebarLabel->get() : tr( "Option selection" );
 }
 
 QString
@@ -88,7 +88,7 @@ Config::loadGroupList( const QVariantList& groupData )
     m_model->setupModelData( groupData );
     if ( m_model->rowCount() < 1 )
     {
-        cWarning() << "NetInstall groups data was empty.";
+        cWarning() << "KernelArgChooser groups data was empty.";
         setStatus( Status::FailedNoData );
     }
     else
@@ -117,9 +117,9 @@ Config::setConfigurationMap( const QVariantMap& configurationMap )
     bool bogus = false;
     auto label = Calamares::getSubMap( configurationMap, "label", bogus );
     // Use a different class name for translation lookup because the
-    // .. table of strings lives in NetInstallViewStep.cpp and moving them
+    // .. table of strings lives in KernelArgChooserViewStep.cpp and moving them
     // .. around is annoying for translators.
-    static const char className[] = "NetInstallViewStep";
+    static const char className[] = "KernelArgChooserViewStep";
 
     if ( label.contains( "sidebar" ) )
     {
@@ -147,33 +147,21 @@ Config::setConfigurationMap( const QVariantMap& configurationMap )
     }
 
     setStatus( required() ? Status::FailedNoData : Status::Ok );
-    cDebug() << "Loading netinstall from" << m_queue->count() << "alternate sources.";
+    cDebug() << "Loading kernelargchooser from" << m_queue->count() << "alternate sources.";
     connect( m_queue, &LoaderQueue::done, this, &Config::loadingDone );
     m_queue->load();
 }
 
 void
-Config::finalizeGlobalStorage( const Calamares::ModuleSystem::InstanceKey& key )
+Config::finalizeGlobalStorage()
 {
-    auto packages = model()->getPackages();
+    auto options = model()->getOptions();
 
-    // This netinstall module may add two sub-steps to the packageOperations,
-    // one for installing and one for try-installing.
-    QVariantList installPackages;
-    QVariantList tryInstallPackages;
+    QString outputArguments = "";
 
-    for ( const auto& package : packages )
+    for ( const auto& option : options )
     {
-        if ( package->isCritical() )
-        {
-            installPackages.append( package->toOperation() );
-        }
-        else
-        {
-            tryInstallPackages.append( package->toOperation() );
-        }
+        outputArguments += option->toOperation() + " ";
     }
-
-    Calamares::Packages::setGSPackageAdditions(
-        Calamares::JobQueue::instance()->globalStorage(), key, installPackages, tryInstallPackages );
+    Calamares::JobQueue::instance()->globalStorage()->insert( "options", outputArguments );
 }

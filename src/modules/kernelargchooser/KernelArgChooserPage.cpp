@@ -10,10 +10,10 @@
  *
  */
 
-#include "NetInstallPage.h"
+#include "KernelArgChooserPage.h"
 
-#include "PackageModel.h"
-#include "ui_page_netinst.h"
+#include "OptionModel.h"
+#include "ui_page_chooser.h"
 
 #include "GlobalStorage.h"
 #include "JobQueue.h"
@@ -26,7 +26,7 @@
 #include <QHeaderView>
 #include <QNetworkReply>
 
-NetInstallPage::NetInstallPage( Config* c, QWidget* parent )
+KernelArgChooserPage::KernelArgChooserPage( Config* c, QWidget* parent )
     : QWidget( parent )
     , m_config( c )
     , ui( new Ui::Page_NetInst )
@@ -34,7 +34,7 @@ NetInstallPage::NetInstallPage( Config* c, QWidget* parent )
     ui->setupUi( this );
     ui->groupswidget->header()->setSectionResizeMode( QHeaderView::ResizeToContents );
     ui->groupswidget->setModel( c->model() );
-    connect( c, &Config::statusChanged, ui->netinst_status, &QLabel::setText );
+    connect( c, &Config::statusChanged, ui->chooser_status, &QLabel::setText );
     connect( c,
              &Config::titleLabelChanged,
              [ ui = this->ui ]( const QString title )
@@ -42,20 +42,20 @@ NetInstallPage::NetInstallPage( Config* c, QWidget* parent )
                  ui->label->setVisible( !title.isEmpty() );
                  ui->label->setText( title );
              } );
-    connect( c, &Config::statusReady, this, &NetInstallPage::expandGroups );
+    connect( c, &Config::statusReady, this, &KernelArgChooserPage::expandGroups );
 }
 
-NetInstallPage::~NetInstallPage() {}
+KernelArgChooserPage::~KernelArgChooserPage() {}
 
 void
-NetInstallPage::expandGroups()
+KernelArgChooserPage::expandGroups()
 {
     auto* model = m_config->model();
     // Go backwards because expanding a group may cause rows to appear below it
     for ( int i = model->rowCount() - 1; i >= 0; --i )
     {
         auto index = model->index( i, 0 );
-        if ( model->data( index, PackageModel::MetaExpandRole ).toBool() )
+        if ( model->data( index, OptionModel::MetaExpandRole ).toBool() )
         {
             ui->groupswidget->setExpanded( index, true );
         }
@@ -63,22 +63,7 @@ NetInstallPage::expandGroups()
 }
 
 void
-NetInstallPage::onActivate()
+KernelArgChooserPage::onActivate()
 {
     ui->groupswidget->setFocus();
-
-    // The netinstallSelect global storage value can be used to make additional items selected by default
-    Calamares::GlobalStorage* gs = Calamares::JobQueue::instance()->globalStorage();
-    const QStringList selectNames = gs->value( "netinstallSelect" ).toStringList();
-    if ( !selectNames.isEmpty() )
-    {
-        m_config->model()->setSelections( selectNames );
-    }
-
-    // If NetInstallAdd is found in global storage, add those items to the tree
-    const QVariantList groups = gs->value( "netinstallAdd" ).toList();
-    if ( !groups.isEmpty() )
-    {
-        m_config->model()->appendModelData( groups );
-    }
 }

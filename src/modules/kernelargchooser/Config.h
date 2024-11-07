@@ -12,7 +12,7 @@
 #ifndef NETINSTALL_CONFIG_H
 #define NETINSTALL_CONFIG_H
 
-#include "PackageModel.h"
+#include "OptionModel.h"
 
 #include "locale/TranslatableConfiguration.h"
 #include "modulesystem/InstanceKey.h"
@@ -28,7 +28,7 @@ class Config : public QObject
 {
     Q_OBJECT
 
-    Q_PROPERTY( PackageModel* packageModel MEMBER m_model FINAL )
+    Q_PROPERTY( OptionModel* optionModel MEMBER m_model FINAL )
     Q_PROPERTY( QString status READ status NOTIFY statusChanged FINAL )
 
     // Translations, of the module name (for sidebar) and above the list
@@ -60,7 +60,7 @@ public:
     bool required() const { return m_required; }
     void setRequired( bool r ) { m_required = r; }
 
-    PackageModel* model() const { return m_model; }
+    OptionModel* model() const { return m_model; }
 
     QString sidebarLabel() const;
     QString titleLabel() const;
@@ -68,16 +68,16 @@ public:
     /** @brief Fill model from parsed data.
      *
      * Fills the model with a list of groups -- which can contain
-     * subgroups and packages -- from @p groupData.
+     * subgroups and options -- from @p groupData.
      */
     void loadGroupList( const QVariantList& groupData );
 
-    /** @brief Write the selected package lists to global storage
+    /** @brief Write the selected option lists to global storage
      *
      * Since the config doesn't know what module it is for,
      * pass in an instance key.
      */
-    void finalizeGlobalStorage( const Calamares::ModuleSystem::InstanceKey& key );
+    void finalizeGlobalStorage();
 
 Q_SIGNALS:
     void statusChanged( QString status );  ///< Something changed
@@ -92,7 +92,7 @@ private Q_SLOTS:
 private:
     Calamares::Locale::TranslatedString* m_sidebarLabel = nullptr;  // As it appears in the sidebar
     Calamares::Locale::TranslatedString* m_titleLabel = nullptr;
-    PackageModel* m_model = nullptr;
+    OptionModel* m_model = nullptr;
     LoaderQueue* m_queue = nullptr;
     Status m_status = Status::Ok;
     bool m_required = false;
