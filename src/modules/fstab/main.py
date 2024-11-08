@@ -15,6 +15,7 @@
 import os
 import re
 import copy
+import subprocess
 
 import libcalamares
 
@@ -195,14 +196,18 @@ class FstabGenerator(object):
 
         with open(fstab_path, "w") as fstab_file:
             print(FSTAB_HEADER, file=fstab_file)
+
             print(
-                libcalamares.utils.host_env_process_output(
+                subprocess.run(
                     [
                         "/usr/share/calamares/scripts/build-fstab",
                         self.root_mount_point,
                         ["", "nodata"]["/data" in str(self.partitions)],
-                    ]
-                ),
+                    ],
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
+                    text=True,
+                ).stdout,
                 file=fstab_file,
             )
 

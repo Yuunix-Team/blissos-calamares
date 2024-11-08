@@ -56,7 +56,15 @@ def run():
         )
 
     libcalamares.utils.host_env_process_output(
-        ["/usr/share/calamares/scripts/gen-img", root_mount_point], None
+        [
+            "/usr/share/calamares/scripts/gen-img",
+            root_mount_point,
+            ["", "img"][
+                "DATA=data.img" in str(libcalamares.globalstorage.value("options"))
+                and "/data" not in str(libcalamares.globalstorage.value("partitions"))
+            ],
+        ],
+        None,
     )
     libcalamares.job.setprogress(1.0)
     return None
