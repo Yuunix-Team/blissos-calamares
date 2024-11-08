@@ -41,6 +41,15 @@ def pretty_status_message():
     return status
 
 
+def mkdir_p(path):
+    """Create directory.
+
+    :param path:
+    """
+    if not os.path.exists(path):
+        os.makedirs(path)
+
+
 def run():
     """
     Create misc.img and data.img in cases
@@ -89,7 +98,9 @@ def run():
 
         print("SRC=", file=grubConf)
 
-    with open(os.path.join(root_mount_point, "boot/grub/android.cfg"), "w") as envCfg:
+    grubDir = os.path.join(root_mount_point, "boot/grub")
+    mkdir_p(grubDir)
+    with open(os.path.join(grubDir, "android.cfg"), "a") as envCfg:
         print("SLOT=_a", file=envCfg)
 
     libcalamares.job.setprogress(1.0)
