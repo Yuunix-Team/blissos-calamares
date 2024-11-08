@@ -993,14 +993,14 @@ PartitionCoreModule::layoutApply( Device* dev,
     // PartitionInfo::mountPoint() says where it will be mounted in the target system.
     // .. the latter is more interesting.
     //
-    // If we have a separate /grub, mark that one as bootable,
+    // If we have a separate /boot, mark that one as bootable,
     // otherwise mark the root / as bootable.
     //
     // If the layout hasn't applied a label to the partition,
     //      apply a default label (to boot and root, at least).
     const auto is_boot = []( const Partition* p ) -> bool
     {
-        const QString boot = QStringLiteral( "/grub" );
+        const QString boot = QStringLiteral( "/boot" );
         return PartitionInfo::mountPoint( p ) == boot || p->mountPoint() == boot;
     };
     const auto is_root = []( const Partition* p ) -> bool

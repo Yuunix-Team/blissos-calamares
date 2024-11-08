@@ -27,7 +27,7 @@
 QStringList
 standardMountPoints()
 {
-    QStringList mountPoints { "/", "/grub", "/data", "/super" };
+    QStringList mountPoints { "/", "/boot", "/data" };
     if ( PartUtils::isEfiSystem() )
     {
         mountPoints << Calamares::JobQueue::instance()->globalStorage()->value( "efiSystemPartition" ).toString();

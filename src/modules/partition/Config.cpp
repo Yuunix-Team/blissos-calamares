@@ -282,7 +282,7 @@ fillGSConfigurationEFI( Calamares::GlobalStorage* gs, const QVariantMap& configu
         const auto efiSystemPartition = Calamares::getString(
             efiConfiguration,
             "mountPoint",
-            Calamares::getString( configurationMap, "efiSystemPartition", QStringLiteral( "/efi" ) ) );
+            Calamares::getString( configurationMap, "efiSystemPartition", QStringLiteral( "/boot/efi" ) ) );
         // This specific GS key is also used by bootloader and grubcfg modules,
         // as well as partition module internalls.
         gs->insert( "efiSystemPartition", efiSystemPartition );

@@ -18,7 +18,6 @@
 #include "JobQueue.h"
 #include "compat/Variant.h"
 #include "network/Manager.h"
-#include "packages/Globals.h"
 #include "utils/Logger.h"
 #include "utils/Retranslator.h"
 #include "utils/Variant.h"

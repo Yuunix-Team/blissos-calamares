@@ -87,7 +87,7 @@ BootLoaderModel::updateInternal()
     }
 
     QString partitionText;
-    Partition* partition = KPMHelpers::findPartitionByMountPoint( m_devices, "/grub" );
+    Partition* partition = KPMHelpers::findPartitionByMountPoint( m_devices, "/boot" );
     if ( partition )
     {
         partitionText = tr( "Boot Partition", "@info" );
@@ -127,7 +127,7 @@ BootLoaderModel::updateInternal()
         }
     }
     // Create "don't install bootloader" item. This is always available,
-    // also if there was no /grub or / partition found.
+    // also if there was no /boot or / partition found.
     appendRow( createBootLoaderItem( tr( "Do not install a boot loader", "@label" ), QString(), false ) );
 }
 

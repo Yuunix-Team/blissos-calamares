@@ -609,7 +609,7 @@ def run_grub_mkconfig(partitions, output_file):
         check_target_env_call([libcalamares.job.configuration["grubMkconfig"], "-o", output_file])
 
 
-def run_grub_install(fw_type, partitions, efi_directory):
+def run_grub_install(fw_type, partitions, root_mountpoint, efi_directory):
     """
     Runs grub-install in the target environment
 
@@ -632,12 +632,17 @@ def run_grub_install(fw_type, partitions, efi_directory):
 
         if is_zfs:
             check_target_env_call(["sh", "-c", "ZPOOL_VDEV_NAME_PATH=1 " + libcalamares.job.configuration["grubInstall"]
-                                   + " --target=" + efi_target + " --efi-directory=" + efi_directory
-                                   + " --bootloader-id=" + efi_bootloader_id + " --force"])
+                                   + " --target=" + efi_target
+                                   + " --efi-directory=" + root_mountpoint + efi_directory
+                                   + " --boot-directory=" + root_mountpoint + "/boot"
+                                   + " --bootloader-id=" + efi_bootloader_id
+                                   + " --force"])
         else:
             check_target_env_call([libcalamares.job.configuration["grubInstall"],
                                    "--target=" + efi_target,
                                    "--efi-directory=" + efi_directory,
+                                   "--efi-directory=" + root_mountpoint + efi_directory,
+                                   "--boot-directory=" + root_mountpoint + "/boot",
                                    "--bootloader-id=" + efi_bootloader_id,
                                    "--force"])
     else:
@@ -652,10 +657,12 @@ def run_grub_install(fw_type, partitions, efi_directory):
         if is_zfs:
             check_target_env_call(["sh", "-c", "ZPOOL_VDEV_NAME_PATH=1 "
                                    + libcalamares.job.configuration["grubInstall"]
+                                   + " --boot-directory=" + root_mountpoint + "/boot"
                                    + " --target=i386-pc --recheck --force "
                                    + boot_loader["installPath"]])
         else:
             check_target_env_call([libcalamares.job.configuration["grubInstall"],
+                                   "--boot-directory=" + root_mountpoint + "/boot",
                                    "--target=i386-pc",
                                    "--recheck",
                                    "--force",
@@ -687,7 +694,7 @@ def install_grub(efi_directory, fw_type):
 
         efi_target, efi_grub_file, efi_boot_file = get_grub_efi_parameters()
 
-        run_grub_install(fw_type, partitions, efi_directory)
+        run_grub_install(fw_type, partitions, installation_root_path, efi_directory)
 
         # VFAT is weird, see issue CAL-385
         install_efi_directory_firmware = (vfat_correct_case(
@@ -718,9 +725,9 @@ def install_grub(efi_directory, fw_type):
             shutil.copy2(efi_file_source, efi_file_target)
     else:
         libcalamares.utils.debug("Bootloader: grub (bios)")
-        run_grub_install(fw_type, partitions, None)
+        run_grub_install(fw_type, partitions, installation_root_path, None)
 
-    run_grub_mkconfig(partitions, libcalamares.job.configuration["grubCfg"])
+    run_grub_mkconfig(partitions, installation_root_path + libcalamares.job.configuration["grubCfg"])
 
 
 def install_secureboot(efi_directory):

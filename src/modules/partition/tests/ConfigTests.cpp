@@ -83,7 +83,7 @@ ConfigTests::testEmptyConfig()
     const auto firmware = gs->value( "firmwareType" ).toString();
     QVERIFY( firmware == "efi" || firmware == "bios" );
 
-    QCOMPARE( gs->value( "efiSystemPartition" ).toString(), "/efi" );  // Default
+    QCOMPARE( gs->value( "efiSystemPartition" ).toString(), "/boot/efi" );  // Default
 }
 
 void
@@ -146,7 +146,7 @@ ConfigTests::testAll()
         QCOMPARE( PartUtils::efiFilesystemRecommendedSize(), 75_MiB );  // From config
         QCOMPARE( PartUtils::efiFilesystemMinimumSize(), 75_MiB );  // No separate setting
 
-        QCOMPARE( gs->value( "efiSystemPartition" ).toString(), QStringLiteral( "/grub/thisisatest" ) );
+        QCOMPARE( gs->value( "efiSystemPartition" ).toString(), QStringLiteral( "/boot/thisisatest" ) );
         QCOMPARE( gs->value( "efiSystemPartitionName" ).toString(), QStringLiteral( "testLabel" ) );
     }
 
@@ -166,7 +166,7 @@ ConfigTests::testAll()
         QCOMPARE( PartUtils::efiFilesystemRecommendedSize(), 80_MiB );  // From config
         QCOMPARE( PartUtils::efiFilesystemMinimumSize(), 65_MiB );  // Taken from config
 
-        QCOMPARE( gs->value( "efiSystemPartition" ).toString(), QStringLiteral( "/grub/thisismodern" ) );
+        QCOMPARE( gs->value( "efiSystemPartition" ).toString(), QStringLiteral( "/boot/thisismodern" ) );
         QCOMPARE( gs->value( "efiSystemPartitionName" ).toString(), QStringLiteral( "UEFI" ) );
     }
 
@@ -181,7 +181,7 @@ ConfigTests::testAll()
         QCOMPARE( PartUtils::efiFilesystemRecommendedSize(), 175_MiB );  // From config
         QCOMPARE( PartUtils::efiFilesystemMinimumSize(), 80_MiB );  // Taken from config
 
-        QCOMPARE( gs->value( "efiSystemPartition" ).toString(), QStringLiteral( "/grub/thisismixed" ) );
+        QCOMPARE( gs->value( "efiSystemPartition" ).toString(), QStringLiteral( "/boot/thisismixed" ) );
         QCOMPARE( gs->value( "efiSystemPartitionName" ).toString(), QStringLiteral( "legacy" ) );
     }
 
@@ -196,7 +196,7 @@ ConfigTests::testAll()
         QCOMPARE( PartUtils::efiFilesystemRecommendedSize(), 300_MiB );  // From modern config
         QCOMPARE( PartUtils::efiFilesystemMinimumSize(), 100_MiB );  // Taken from modern config, legacy ignored
 
-        QCOMPARE( gs->value( "efiSystemPartition" ).toString(), QStringLiteral( "/grub/thisoverlaps" ) );
+        QCOMPARE( gs->value( "efiSystemPartition" ).toString(), QStringLiteral( "/boot/thisoverlaps" ) );
         QCOMPARE( gs->value( "efiSystemPartitionName" ).toString(), QStringLiteral( "legacy" ) );
     }
 }
