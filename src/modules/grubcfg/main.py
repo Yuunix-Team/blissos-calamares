@@ -60,20 +60,8 @@ def run():
             _('rootMountPoint is "{}", which does not exist.'.format(root_mount_point)),
         )
 
-    os.replace(
-        os.path.abspath("/usr/share/calamares/scripts/10_blissos"),
-        os.path.abspath("/etc/grub.d/10_linux"),
-    )
-
     libcalamares.utils.host_env_process_output(
-        [
-            "sed",
-            "-i",
-            "-r",
-            "'s/(GRUB_DEVICE(_BOOT)?)=.*$/\1=\$GRUB_DEVICE/g'",
-            "/sbin/grub-mkconfig",
-        ],
-        None,
+        ["/usr/share/calamares/scripts/grubcfg"], None
     )
 
     with open(os.path.abspath("/etc/default/grub"), "a") as grubConf:
@@ -87,9 +75,17 @@ def run():
         print("GRUB_CMDLINE_ANDROID='" + kernel_args + "'", file=grubConf)
 
         partitions = libcalamares.globalstorage.value("partitions")
+        boot_device = ""
         for partition in partitions:
-            if partition["mountPoint"] == "/":
-                print("GRUB_DEVICE='" + partition["device"] + "'", file=grubConf)
+            dev = partition["device"]
+            mntpt = partition["mountPoint"]
+            if mntpt == "/":
+                print("GRUB_DEVICE='" + dev + "'", file=grubConf)
+                boot_device = dev
+            elif mntpt == "/boot":
+                boot_device = dev
+
+        print("GRUB_DEVICE_BOOT='" + boot_device + "'", file=grubConf)
 
         print("SRC=", file=grubConf)
 

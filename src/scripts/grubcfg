@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# Move config to its right path
+cp /usr/share/calamares/scripts/10_blissos /etc/grub.d/10_linux
+
+# Patch grub-mkconfig
+# shellcheck disable=SC2016
+sed -i -r 's/(GRUB_DEVICE(_BOOT)?)=.*$/\1=\$\1/g' /sbin/grub-mkconfig

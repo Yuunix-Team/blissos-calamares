@@ -1,5 +1,5 @@
 #!/bin/bash
-# shellcheck disable=SC2086
+# shellcheck disable=SC2086,SC2001,SC2154,SC1091
 set -e
 
 # grub-mkconfig helper script.
@@ -59,11 +59,6 @@ android_entry() {
 
 	echo "menuentry '$(echo "$title" | grub_quote)' ${CLASS} \$menuentry_id_option '$OS-${TITLE// /_}-_$slot${extra_args:+-${extra_args// /_}}' {"
 
-	case "$mode" in
-	recovery) extra_args="${extra_args} RCVRY=1 androidboot.mode=recovery androidboot.force_normal_boot=0" ;;
-	*) ;;
-	esac
-
 	save_default_entry | grub_add_tab
 
 	# Use ELILO's generic "efifb" when it's known to be available.
@@ -81,8 +76,8 @@ android_entry() {
 	fi
 
 	echo "	insmod gzio"
-	echo "$disk"
-	echo "	linux $SRC/kernel_$slot $GRUB_CMDLINE_ANDROID $extra_args root=/dev/ram0 SRC=$SRC"
+	echo "$disk" | sed "s/^/$grub_tab/gm"
+	echo "	linux $SRC/kernel_$slot $GRUB_CMDLINE_ANDROID $extra_args root=/dev/ram0 SRC=$SRC androidboot.slot_suffix=_$slot"
 	echo "	initrd $SRC/initrd_$slot.img"
 	echo "}
 "
@@ -128,6 +123,8 @@ done
 echo "${grub_tab}}"
 
 echo "}"
+
+GRUB_CMDLINE_ANDROID="$GRUB_CMDLINE_ANDROID RCVRY=1 androidboot.mode=recovery androidboot.force_normal_boot=0"
 
 echo "submenu '$(echo "Recovery modes for $TITLE" | grub_quote)' \$menuentry_id_option '$OS-${TITLE// /_}-Recovery_A' {"
 
