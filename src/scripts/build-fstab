@@ -67,3 +67,11 @@ else
 fi
 
 echo -e "$_d  /data  $_d_fs  $_d_flags  $_d_aflags"
+
+
+echo -e "$_d  /data  $_d_fs  $_d_flags  $_d_aflags"
+
+_b=${3:-"#>boot"}
+[ "$_b" = "noboot" ] && exit 0
+
+echo -e "$_b  /boot"

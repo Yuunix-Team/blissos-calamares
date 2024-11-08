@@ -682,9 +682,10 @@ def install_grub(efi_directory, fw_type):
         libcalamares.utils.warning(_("Failed to install grub, no partitions defined in global storage"))
         return
 
+    installation_root_path = libcalamares.globalstorage.value("rootMountPoint")
+    
     if fw_type == "efi":
         libcalamares.utils.debug("Bootloader: grub (efi)")
-        installation_root_path = libcalamares.globalstorage.value("rootMountPoint")
         install_efi_directory = installation_root_path + efi_directory
 
         if not os.path.isdir(install_efi_directory):

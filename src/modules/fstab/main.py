@@ -203,6 +203,7 @@ class FstabGenerator(object):
                         "/usr/share/calamares/scripts/build-fstab",
                         self.root_mount_point,
                         ["", "nodata"]["/data" in str(self.partitions)],
+                        ["", "noboot"]["/boot" in str(self.partitions)],
                     ],
                     stdout=subprocess.PIPE,
                     stderr=subprocess.STDOUT,

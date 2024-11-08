@@ -37,7 +37,7 @@ properties:
     preCheckEncryption: { type: boolean, default: false }
 
     allowManualPartitioning: { type: boolean, default: true }
-    showNotEncryptedBootMessage: { type: boolean, default: true }
+    showNotEncryptedBootMessage: { type: boolean, default: false }
     partitionLayout: { type: array }  # TODO: specify items
     initialPartitioningChoice: { type: string, enum: [ none, erase, replace, alongside, manual ] }
     initialSwapChoice: { type: string, enum: [ none, small, suspend, reuse, file ] }
