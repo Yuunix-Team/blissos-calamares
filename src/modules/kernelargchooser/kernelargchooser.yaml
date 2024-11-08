@@ -14,17 +14,12 @@
 #       description: "RCVRY=1 androidboot.mode=recovery androidboot.force_normal_boot=0 androidboot.pixel_format=RGBA_8888"
 
 - name: "Logging & Debugging"
-  description:
-  distinct: false
   subgroups:
     - name: "Virtual console"
-      description:
-      distinct: false
       options:
         - name: "Enable virtual console"
           description: "androidboot.enable_console=1"
     - name: "Debug shell"
-      description:
       distinct: true
       options:
         - name: "DEBUG=1"
@@ -33,15 +28,11 @@
           description: "DEBUG=2"
 
 - name: "Media codecs"
-  description:
-  distinct: false
   subgroups:
     - name: "FFMPEG Codec2"
-      description:
       distinct: true
       subgroups:
         - name: "Enable FFMPEG Codec2"
-          description:
           distinct: true
           options:
             - name: "Default"
@@ -49,7 +40,6 @@
             - name: "With DRM Prime Handle"
               description: "FFMPEG_CODEC2_PREFER=1 FFMPEG_CODEC2_DRM=1"
         - name: "Disable FFMPEG Codec2"
-          description:
           distinct: true
           options:
             - name: "Default"
@@ -60,7 +50,6 @@
               description: "CODEC2_LEVEL=0 FFMPEG_OMX_CODEC=1"
     - name: "Miscs for FFMPEG"
       description: "(Must enable FFMPEG codecs in either c2 or OMX)"
-      distinct: false
       options:
         - name: "Enable logging for FFMPEG codecs"
           description: "FFMPEG_CODEC_LOG=1"
@@ -68,30 +57,29 @@
           description: "FFMPEG_HWACCEL_DISABLE=1"
 
 - name: "Disks & partitions"
-  description:
-  distinct: false
-  options:
-    - name: "Disable SDCardFS/ESDFS bind mounting"
-      description: "SDCARDFS_DISABLE=1"
-    - name: "Boot with NTFS3 on a NTFS partition"
-      description: "BOOT_USE_NTFS3=1"
-    - name: "Set NTFS3 as default driver on vold to mount NTFS"
-      description: "VOLD_USE_NTFS3=1"
-    - name: "Boot & Set NTFS3 as default on vold"
-      description: "USE_NTFS3=1"
-    - name: "Mount all internal partitions"
-      description: INTERNAL_MOUNT=1
+  subgroups:
+    - name: "NTFS options"
+      distinct: true
+      options:
+        - name: "Boot with NTFS3 on a NTFS partition"
+          description: "BOOT_USE_NTFS3=1"
+        - name: "Set NTFS3 as default driver on vold to mount NTFS"
+          description: "VOLD_USE_NTFS3=1"
+        - name: "Boot & Set NTFS3 as default on vold"
+          description: "USE_NTFS3=1"
+    - name: "Miscs"
+      options:
+        - name: "Disable SDCardFS/ESDFS bind mounting"
+          description: "SDCARDFS_DISABLE=1"
+        - name: "Mount all internal partitions"
+          description: INTERNAL_MOUNT=1
 
 - name: "Networking"
-  description:
-  distinct: false
   options:
     - name: "Enable virtual wifi"
       description: "VIRT_WIFI=1"
 
 - name: "Sensors"
-  description:
-  distinct: false
   options:
     - name: "Force kbd sensors"
       description: "SENSORS_FORCE_KBDSENSOR=1"
@@ -101,8 +89,6 @@
       description: "SET_OVERRIDE_FORCED_ORIENT=true"
 
 - name: "Battery"
-  description:
-  distinct: false
   options:
     - name: "Set fake battery level"
       description: "SET_FAKE_BATTERY_LEVEL="
@@ -113,8 +99,6 @@
       description: "androidboot.fake_battery=1"
 
 - name: "Audio"
-  description:
-  distinct: false
   options:
     - name: "Set default audio HAL to x86"
       description: "AUDIO_PRIMARY=x86"
@@ -122,8 +106,6 @@
       description: "AUDIO_PRIMARY=x86_celadon"
 
 - name: "Bluetooth"
-  description:
-  distinct: false
   options:
     - name: "Use btlinux Bluetooth HAL instead"
       description: "BTLINUX_HAL=1"
@@ -136,11 +118,8 @@
       editable: true
 
 - name: "Graphics"
-  description:
-  distinct: false
   subgroups:
     - name: "Hardware acceleration"
-      description:
       distinct: true
       options:
         - name: "Disable hardware acceleration"
@@ -148,11 +127,9 @@
         - name: "Disable video driver loading (also disable HWACCEL)"
           description: "nomodeset"
     - name: "EGL"
-      description:
       distinct: true
       subgroups:
         - name: "Mesa EGL"
-          description:
           distinct: true
           options:
             - name: "Set EGL to Mesa"
@@ -162,13 +139,11 @@
             - name: "Force Mesa EGL to use Zink"
               description: "EGL=mesa MESA_ZINK=1"
         - name: "ANGLE EGL"
-          description:
           distinct: true
           options:
             - name: "Set EGL to ANGLE"
               description: "EGL=angle"
     - name: "OpenGLES"
-      description:
       distinct: true
       options:
         - name: "Force OpenGLES version to 3.0"
@@ -178,13 +153,11 @@
         - name: "Force OpenGLES version to 3.2"
           description: "FORCE_GLES=3.2"
     - name: "RenderEngine"
-      description:
       distinct: true
       options:
         - name: "Force default RenderEngine backend to skiagl"
           description: "FORCE_RENDERENGINE=skiagl"
     - name: "HWC HIDL"
-      description:
       distinct: true
       options:
         - name: "Set default HWC HIDL interface to v2.1"
@@ -194,7 +167,6 @@
         - name: "Set default HWC HIDL interface to drmfb"
           description: "HWC_HIDL=drmfb"
     - name: "HWC"
-      description:
       distinct: true
       options:
         - name: "Set default HWC to drm"
@@ -206,7 +178,6 @@
         - name: "Set default HWC to drm_minigbm_celadon (can only be used with minigbm* gralloc)"
           description: "HWC=drm_minigbm_celadon"
     - name: "Gralloc"
-      description:
       distinct: true
       options:
         - name: "Set default Gralloc to gbm (in some cases it needs HWC_HIDL=default-2.1)"
@@ -220,7 +191,6 @@
         - name: "Set default Gralloc to minigbm_arcvm (for VMs with virtio-gpu only)"
           description: "GRALLOC=minigbm_arcvm"
     - name: "Vulkan"
-      description:
       distinct: true
       options:
         - name: "Set default Vulkan HAL to lvp"
@@ -229,7 +199,6 @@
           description: "VULKAN=pastel"
     - name: "Miscs for celadon"
       description: "(only available if HWC is either drm_celadon or drm_minigbm_celadon)"
-      distinct: false
       options:
         - name: "Enable multi-plane in HWC"
           description: "MULTI_PLANE=1"
@@ -247,8 +216,6 @@
         - name: "Enable multi refresh rate for the system"
           description: "MULTI_REFRESH_RATE=1"
 - name: "Miscellaneous"
-  description:
-  distinct: false
   options:
     - name: "Set default DPI"
       description: "DPI="

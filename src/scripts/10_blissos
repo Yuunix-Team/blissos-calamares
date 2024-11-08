@@ -88,14 +88,14 @@ android_entry() {
 "
 }
 
-disk="$(prepare_grub_to_access_device "$DEVICE")"
+disk="$(prepare_grub_to_access_device "$GRUB_DEVICE")"
 
 unset IFS
 
 # Extra indentation to add to menu entries in a submenu. We're not in a submenu
 # yet, so it's empty. In a submenu it will be equal to '\t' (one tab).
-ROOT_DEVICE=$DEVICE
-ROOT_UUID=$(${grub_probe} --device "$DEVICE" --target=fs_uuid 2>/dev/null)
+ROOT_DEVICE=$GRUB_DEVICE
+ROOT_UUID=$(${grub_probe} --device "$GRUB_DEVICE" --target=fs_uuid 2>/dev/null)
 
 echo $ROOT_UUID
 
@@ -118,14 +118,14 @@ for arg in "${ADVANCED_ARGS[@]}"; do
 	entry a default $arg
 done
 
-echo "  submenu '$(echo "Advanced options for $TITLE" | grub_quote) - Slot B' \$menuentry_id_option '$OS-${TITLE// /_}-Advanced_B' {"
+echo "${grub_tab}submenu '$(echo "Advanced options for $TITLE" | grub_quote) - Slot B' \$menuentry_id_option '$OS-${TITLE// /_}-Advanced_B' {"
 
 submenu_indentation=$grub_tab$grub_tab
 for arg in "${ADVANCED_ARGS[@]}"; do
 	entry b default $arg
 done
 
-echo "  }"
+echo "${grub_tab}}"
 
 echo "}"
 
@@ -136,13 +136,13 @@ for arg in "${RECOVERY_ARGS[@]}"; do
 	entry a recovery $arg
 done
 
-echo "  submenu '$(echo "Recovery modes for $TITLE" | grub_quote) - Slot B' \$menuentry_id_option '$OS-${TITLE// /_}-Recovery_B' {"
+echo "${grub_tab}submenu '$(echo "Recovery modes for $TITLE" | grub_quote) - Slot B' \$menuentry_id_option '$OS-${TITLE// /_}-Recovery_B' {"
 
 submenu_indentation=$grub_tab$grub_tab
 for arg in "${RECOVERY_ARGS[@]}"; do
 	entry b recovery $arg
 done
 
-echo "  }"
+echo "${grub_tab}}"
 
 echo "}"

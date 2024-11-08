@@ -21,7 +21,7 @@ definitions:
         description: Longer discussion in `kernelargchooser.conf` file under 'Groups Format'
         properties:
             name: { type: string }
-            description: { type: string }
+            description: { type: string, default: "" }
             options:
                 type: array
                 items: { $ref: "#/definitions/option" }
@@ -45,13 +45,13 @@ definitions:
                 description: an optional command to run within the new system after the group's
                     options are installed. It will run after **each** option in the group
                     is installed.
-        required: [name, description] # Always required, at any level in the subgroups hirearchy
+        required: [name] # Always required, at any level in the subgroups hirearchy
         if:
             properties:
                 subgroups:
                     maxItems: 0
         then:
-            required: [name, description, options] # bottom-most (sub)group requires some option (otherwise, why bother?)
+            required: [name, options] # bottom-most (sub)group requires some option (otherwise, why bother?)
     groups:
         type: array
         items: { $ref: "#/definitions/group" }

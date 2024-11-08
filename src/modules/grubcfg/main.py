@@ -62,19 +62,34 @@ def run():
 
     os.replace(
         os.path.abspath("/usr/share/calamares/scripts/10_blissos"),
-        os.path.join(root_mount_point, "etc/grub.d/10_linux"),
+        os.path.abspath("/etc/grub.d/10_linux"),
+    )
+
+    libcalamares.utils.host_env_process_output(
+        [
+            "sed",
+            "-i",
+            "-r",
+            "'s/(GRUB_DEVICE(_BOOT)?)=.*$/\1=\$GRUB_DEVICE/g'",
+            "/sbin/grub-mkconfig",
+        ],
+        None,
     )
 
     with open(os.path.abspath("/etc/default/grub"), "a") as grubConf:
+        print("GRUB_TIMEOUT=10", file=grubConf)
+        print("GRUB_TIMEOUT_STYLE=menu", file=grubConf)
+        print("GRUB_DISTRIBUTOR=BlissLabs", file=grubConf)
+        print("GRUB_GFXPAYLOAD_LINUX=keep", file=grubConf)
         print("GRUB_DISABLE_OS_PROBER=false", file=grubConf)
-        
+
         kernel_args = libcalamares.globalstorage.value("options")
         print("GRUB_CMDLINE_ANDROID='" + kernel_args + "'", file=grubConf)
-        
+
         partitions = libcalamares.globalstorage.value("partitions")
         for partition in partitions:
-            if partition["mountpoint"] == "/":
-                print("DEVICE='" +partition["device"]+"'", file=grubConf)
+            if partition["mountPoint"] == "/":
+                print("GRUB_DEVICE='" + partition["device"] + "'", file=grubConf)
 
         print("SRC=", file=grubConf)
 
