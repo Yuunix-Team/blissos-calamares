@@ -89,5 +89,8 @@ def run():
 
         print("SRC=", file=grubConf)
 
+    with open(os.path.join(root_mount_point, "boot/grub/android.cfg"), "w") as envCfg:
+        print("SLOT=_a", file=envCfg)
+
     libcalamares.job.setprogress(1.0)
     return None

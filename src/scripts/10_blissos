@@ -42,22 +42,9 @@ RECOVERY_ARGS=(
 )
 
 android_entry() {
-	local slot=$1 \
-		mode=$2
+	local extra_args=$*
 
-	shift 2
-	local extra_args=$* title
-
-	title="$TITLE - Slot ${slot^}"
-
-	case "$mode" in
-	recovery) title="$title - Recovery Mode" ;;
-	*) ;;
-	esac
-
-	title=$title${extra_args:+ - $extra_args}
-
-	echo "menuentry '$(echo "$title" | grub_quote)' ${CLASS} \$menuentry_id_option '$OS-${TITLE// /_}-_$slot${extra_args:+-${extra_args// /_}}' {"
+	echo "menuentry '$(echo "$TITLE${extra_args:+ - $extra_args}" | grub_quote)' ${CLASS} \$menuentry_id_option '$OS-${TITLE// /_}-\$SLOT${extra_args:+-${extra_args// /_}}' {"
 
 	save_default_entry | grub_add_tab
 
@@ -77,8 +64,8 @@ android_entry() {
 
 	echo "	insmod gzio"
 	echo "$disk" | sed "s/^/$grub_tab/gm"
-	echo "	linux $SRC/kernel_$slot $GRUB_CMDLINE_ANDROID $extra_args root=/dev/ram0 SRC=$SRC androidboot.slot_suffix=_$slot"
-	echo "	initrd $SRC/initrd_$slot.img"
+	echo "	linux $SRC/kernel\$SLOT $GRUB_CMDLINE_ANDROID $extra_args root=/dev/ram0 SRC=$SRC androidboot.slot_suffix=\$SLOT"
+	echo "	initrd $SRC/initrd\$SLOT.img"
 	echo "}
 "
 }
@@ -101,45 +88,28 @@ GRUB_CMDLINE_ANDROID="$GRUB_CMDLINE_ANDROID ROOT=$ROOT_DEVICE"
 
 entry() { android_entry "$@" | sed "s/^/$submenu_indentation	/gm"; }
 
-submenu_indentation=""
-for slot in a b; do
-	entry $slot default
-done
+# android.cfg is where BootCTL HAL updates current slot suffix after OTA
+cat <<'EOF'
+source android.cfg
 
-echo "submenu '$(echo "Advanced options for $TITLE" | grub_quote)' \$menuentry_id_option '$OS-${TITLE// /_}-Advanced_A' {"
+export SLOT
+EOF
+
+submenu_indentation=""
+entry
 
 submenu_indentation=$grub_tab
+
+echo "submenu '$(echo "Advanced options for $TITLE" | grub_quote)' \$menuentry_id_option '$OS-${TITLE// /_}-Advanced' {"
 for arg in "${ADVANCED_ARGS[@]}"; do
-	entry a default $arg
+	entry $arg
 done
-
-echo "${grub_tab}submenu '$(echo "Advanced options for $TITLE" | grub_quote) - Slot B' \$menuentry_id_option '$OS-${TITLE// /_}-Advanced_B' {"
-
-submenu_indentation=$grub_tab$grub_tab
-for arg in "${ADVANCED_ARGS[@]}"; do
-	entry b default $arg
-done
-
-echo "${grub_tab}}"
-
 echo "}"
 
+echo "submenu '$(echo "Recovery modes for $TITLE" | grub_quote)' \$menuentry_id_option '$OS-${TITLE// /_}-Recovery' {"
+TITLE="$TITLE - Recovery Mode"
 GRUB_CMDLINE_ANDROID="$GRUB_CMDLINE_ANDROID RCVRY=1 androidboot.mode=recovery androidboot.force_normal_boot=0"
-
-echo "submenu '$(echo "Recovery modes for $TITLE" | grub_quote)' \$menuentry_id_option '$OS-${TITLE// /_}-Recovery_A' {"
-
-submenu_indentation=$grub_tab
 for arg in "${RECOVERY_ARGS[@]}"; do
-	entry a recovery $arg
+	entry $arg
 done
-
-echo "${grub_tab}submenu '$(echo "Recovery modes for $TITLE" | grub_quote) - Slot B' \$menuentry_id_option '$OS-${TITLE// /_}-Recovery_B' {"
-
-submenu_indentation=$grub_tab$grub_tab
-for arg in "${RECOVERY_ARGS[@]}"; do
-	entry b recovery $arg
-done
-
-echo "${grub_tab}}"
-
 echo "}"
