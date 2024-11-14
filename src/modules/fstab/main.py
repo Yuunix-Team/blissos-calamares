@@ -193,29 +193,22 @@ class FstabGenerator(object):
     def generate_fstab(self):
         """ Create fstab. """
         fstab_path = os.path.join(self.root_mount_point, "fstab.android")
+        kernel_args = str(libcalamares.globalstorage.value("options"))
+        has_part_data = False
+        has_part_boot = False
 
         with open(fstab_path, "w") as fstab_file:
             print(FSTAB_HEADER, file=fstab_file)
-
-            print(
-                subprocess.run(
-                    [
-                        "/usr/share/calamares/scripts/build-fstab",
-                        self.root_mount_point,
-                        ["", "nodata"]["/data" in str(self.partitions)],
-                        ["", "noboot"]["/boot" in str(self.partitions)],
-                    ],
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.STDOUT,
-                    text=True,
-                ).stdout,
-                file=fstab_file,
-            )
+            print('#>system$SLOT.img  /', file=fstab_file)
 
             for partition in self.partitions:
+                if partition["mountPoint"] == "/data":
+                    has_part_data = True
+                elif partition["mountPoint"] == "/boot":
+                    has_part_boot = True
+
                 # Special treatment for a btrfs subvolumes
-                if (partition["fs"] == "btrfs"
-                   and partition["mountPoint"] == "/"):
+                if partition["fs"] == "btrfs" and partition["mountPoint"] == "/":
                     # Subvolume list has been created in mount.conf and curated in mount module,
                     # so all subvolumes here should be safe to add to fstab
                     btrfs_subvolumes = libcalamares.globalstorage.value("btrfsSubvolumes")
@@ -230,6 +223,15 @@ class FstabGenerator(object):
                     dct = self.generate_fstab_line_info(partition)
                     if dct:
                         self.print_fstab_line(dct, file=fstab_file)
+
+            if not has_part_data:
+                if "DATA=data.img" in kernel_args:
+                    print("#>data.img  /data", file=fstab_file)
+                    print("#?/data  /data  auto  loop,noatime  defaults", file=fstab_file)
+                else:
+                    print("#>data  /data", file=fstab_file)
+            if not has_part_boot:
+                print("#>boot  /boot", file=fstab_file)
 
             if self.root_is_ssd:
                 # Old behavior was to mount /tmp as tmpfs

@@ -90,8 +90,7 @@ entry() { android_entry "$@" | sed "s/^/$submenu_indentation	/gm"; }
 
 # android.cfg is where BootCTL HAL updates current slot suffix after OTA
 cat <<'EOF'
-source android.cfg
-
+source $prefix/android.cfg
 export SLOT
 EOF
 
