@@ -185,7 +185,7 @@ PartitionLabelsView::buildTexts( const QModelIndex& index ) const
             {
                 firstLine = tr( "Boot", "@label" );
             }
-            else if ( mountPoint.contains( "/boot/efi" )
+            else if ( mountPoint.contains( "/efi" )
                       && index.data( PartitionModel::FileSystemTypeRole ).toInt() == FileSystem::Fat32 )
             {
                 firstLine = tr( "EFI system", "@label" );

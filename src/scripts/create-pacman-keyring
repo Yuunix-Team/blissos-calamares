@@ -1,0 +1,6 @@
+#!/bin/bash
+# Disabe havged, we have increased reports from "time wrap backwards"
+# haveged -w 1024
+pacman-key --init
+# pkill haveged
+pacman-key --populate archlinux cachyos
